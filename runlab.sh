@@ -266,7 +266,7 @@ else
 fi
 # The Rubin Lap App plus our environment should get the right hub settings
 # This will need to change for JL 3
-cmd="python3 -s -m jupyter labhub \
+cmd="python3 -s -m jupyter lab \
      --ip='*' \
      --port=8888 \
      --no-browser \
