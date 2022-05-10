@@ -266,12 +266,13 @@ else
 fi
 # The Rubin Lap App plus our environment should get the right hub settings
 # This will need to change for JL 3
-cmd="python3 -s -m jupyter lab \
+cmd="python3 -s -m jupyter labhub \
      --ip='*' \
      --port=8888 \
      --no-browser \
      --notebook-dir=${HOME} \
-     --gateway-url='${EXTERNAL_INSTANCE_URL}/nb/hub' \
+     --hub-prefix='/nb/hub' \
+     --hub-host='${EXTERNAL_INSTANCE_URL}' \
      --ContentsManager.allow_hidden=True \
      --FileContentsManager.hide_globs=[] \
      --KernelSpecManager.ensure_native_kernel=False \
