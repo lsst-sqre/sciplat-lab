@@ -274,7 +274,6 @@ cmd="python3 -s -m jupyter lab \
      --gateway-url='${EXTERNAL_INSTANCE_URL}/nb/hub' \
      --ContentsManager.allow_hidden=True \
      --FileContentsManager.hide_globs=[] \
-     --c.JupyterHub.base_url=
      --KernelSpecManager.ensure_native_kernel=False \
      --LabApp.shutdown_no_activity_timeout=${NO_ACTIVITY_TIMEOUT} \
      --MappingKernelManager.cull_idle_timeout=${CULL_KERNEL_IDLE_TIMEOUT} \
