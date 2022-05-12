@@ -277,7 +277,6 @@ cmd="python3 -s -m jupyter labhub \
      --FileContentsManager.hide_globs=[] \
      --KernelSpecManager.ensure_native_kernel=False \
      --ServerApp.log_level=DEBUG \
-     --ServerApp.shutdown_no_activity_timeout=${NO_ACTIVITY_TIMEOUT} \
      --MappingKernelManager.cull_idle_timeout=${CULL_KERNEL_IDLE_TIMEOUT} \
      --MappingKernelManager.cull_connected=${CULL_KERNEL_CONNECTED} \
      --MappingKernelManager.cull_interval=${CULL_KERNEL_INTERVAL} \
