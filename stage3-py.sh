@@ -91,8 +91,7 @@ pip install --upgrade \
        jupyterlab_hdf \
        lsst-efd-client \
        jupyter_firefly_extensions \
-       lsst-rsp \
-       rsp-jupyter-extensions
+       lsst-rsp
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
