@@ -269,10 +269,10 @@ fi
 cmd="python3 -s -m jupyter labhub \
      --ip=* \
      --port=8888 \
-     --no-browser \
+     --ServerApp.open_browser=False \ 
      --notebook-dir=${HOME} \
      --hub-prefix=/nb/hub \
-     --hub-host='${EXTERNAL_INSTANCE_URL}' \
+     --hub-host=${EXTERNAL_INSTANCE_URL} \
      --ContentsManager.allow_hidden=True \
      --FileContentsManager.hide_globs=[] \
      --KernelSpecManager.ensure_native_kernel=False \
