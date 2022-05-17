@@ -271,7 +271,7 @@ cmd="python3 -s -m jupyter labhub \
      --port=8888 \
      --no-browser \
      --notebook-dir=${HOME} \
-     --hub-prefix=/nb/hub'\
+     --hub-prefix=/nb/hub \
      --hub-host='${EXTERNAL_INSTANCE_URL}' \
      --ContentsManager.allow_hidden=True \
      --FileContentsManager.hide_globs=[] \
