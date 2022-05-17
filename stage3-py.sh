@@ -19,7 +19,7 @@ fi
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 		    | jq -r '.[0].version')
 mamba install --no-banner -y \
-      "jupyterlab>=3,<3.4" \
+      "jupyterlab>=3,<4" \
       "rubin-env==${rubin_env_ver}" \
       jupyterhub==2.2.0 \
       ipykernel \
@@ -91,7 +91,8 @@ pip install --upgrade \
        jupyterlab_hdf \
        lsst-efd-client \
        jupyter_firefly_extensions \
-       lsst-rsp
+       lsst-rsp \
+       rsp-jupyter-extensions
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
