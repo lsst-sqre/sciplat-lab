@@ -267,16 +267,16 @@ fi
 # The Rubin Lap App plus our environment should get the right hub settings
 # This will need to change for JL 3
 cmd="python3 -s -m jupyter labhub \
-     --ip='*' \
+     --ip=* \
      --port=8888 \
      --no-browser \
      --notebook-dir=${HOME} \
-     --hub-prefix='/nb/hub' \
+     --hub-prefix=/nb/hub'\
      --hub-host='${EXTERNAL_INSTANCE_URL}' \
      --ContentsManager.allow_hidden=True \
      --FileContentsManager.hide_globs=[] \
      --KernelSpecManager.ensure_native_kernel=False \
-     --ServerApp.log_level=DEBUG \
+     --LabApp.shutdown_no_activity_timeout=${NO_ACTIVITY_TIMEOUT} \
      --MappingKernelManager.cull_idle_timeout=${CULL_KERNEL_IDLE_TIMEOUT} \
      --MappingKernelManager.cull_connected=${CULL_KERNEL_CONNECTED} \
      --MappingKernelManager.cull_interval=${CULL_KERNEL_INTERVAL} \
