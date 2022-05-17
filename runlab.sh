@@ -269,7 +269,7 @@ fi
 cmd="python3 -s -m jupyter labhub \
      --ip=* \
      --port=8888 \
-     --no-browser \ 
+     --no-browser \
      --notebook-dir=${HOME} \
      --hub-prefix=/nb/hub \
      --hub-host=${EXTERNAL_INSTANCE_URL} \
