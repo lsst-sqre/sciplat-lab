@@ -40,7 +40,8 @@ pip install \
       lsst-efd-client \
       jupyter_firefly_extensions \
       lsst-rsp \
-      rsp-jupyter-extensions
+      rsp-jupyter-extensions \
+      nbconvert[webpdf]
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
