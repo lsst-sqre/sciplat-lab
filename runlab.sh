@@ -9,8 +9,7 @@ function copy_butler_credentials() {
     if [ -n "${AWS_SHARED_CREDENTIALS_FILE}" ]; then
         awsname="$(basename ${AWS_SHARED_CREDENTIALS_FILE})"
         newcreds="${creddir}/${awsname}"
-        cp "${AWS_SHARED_CREDENTIALS_FILE}" "${newcreds}"
-        chmod 0600 "${newcreds}"
+	python confmerge.py ini "${AWS_SHARED_CREDENTIALS_FILE}" "${newcreds}"
         ORIG_AWS_SHARED_CREDENTIALS_FILE="${AWS_SHARED_CREDENTIALS_FILE}"
         AWS_SHARED_CREDENTIALS_FILE="${newcreds}"
         export ORIG_AWS_SHARED_CREDENTIALS_FILE AWS_SHARED_CREDENTIALS_FILE
@@ -18,8 +17,7 @@ function copy_butler_credentials() {
     if [ -n "${PGPASSFILE}" ]; then
         pgname="$(basename ${PGPASSFILE})"
         newpg="${creddir}/${pgname}"
-        cp "${PGPASSFILE}" "${newpg}"
-        chmod 0600 "${newpg}"
+	python confmerge.py pgpass "${PGPASSFILE}" "${newpg}"
         ORIG_PGPASSFILE="${PGPASSFILE}"
         PGPASSFILE="${newpg}"
         export ORIG_PGPASSFILE PGPASSFILE
