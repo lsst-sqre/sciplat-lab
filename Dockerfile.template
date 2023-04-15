@@ -27,7 +27,6 @@ ARG  verdir="${jl}/versions.installed"
 RUN  mkdir -p ${BLD} ${verdir}
 COPY stage1-rpm.sh ${BLD}
 RUN  ${BLD}/stage1-rpm.sh
-COPY texlive.profile ${BLD}
 COPY stage2-os.sh ${BLD}
 RUN  ${BLD}/stage2-os.sh
 COPY stage3-py.sh ${BLD}

@@ -9,11 +9,12 @@ yum repolist
 yum -y upgrade
 rpm -qa --qf "%{NAME}\n" | xargs yum -y reinstall
 # Add some other packages
-#  gettext and fontconfig needed for TeXLive and thus PDF export
+#  libXScrnSaver ... gtk3 are needed for the chromium installation for
+#   JupyterLab WebPDF conversion
 #  perl-Digest-MD5 ... file are generally useful utilities
 #  ...and finally enough editors to cover most people's habits
 yum -y install \
-    gettext fontconfig \
+    libXScrnSaver alsa-lib cups-libs at-spi2-atk pango gtk3 \
     perl-Digest-MD5 jq unzip ack screen tmux tree file \
     nano vim-enhanced emacs-nox ed
 # Clear build cache
