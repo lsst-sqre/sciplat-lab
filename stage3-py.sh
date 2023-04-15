@@ -26,7 +26,8 @@ mamba install --no-banner -y \
       "moto<4"
 # Next, things on conda-forge not yet rolled into rubin-rsp-env
 mamba install --no-banner -y \
-      jupyterlab-variableinspector
+      jupyterlab-variableinspector \
+      gh
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
 # lower-level layers have already installed the package (e.g. T&S may have
