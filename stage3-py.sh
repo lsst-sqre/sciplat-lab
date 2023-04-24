@@ -24,7 +24,6 @@ mamba install --no-banner -y \
       "rubin-env-rsp==${rubin_env_ver}"
 # Next, things on conda-forge not yet rolled into rubin-rsp-env
 mamba install --no-banner -y \
-      jupyterlab-variableinspector \
       gh
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
