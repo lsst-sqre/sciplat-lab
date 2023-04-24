@@ -33,7 +33,6 @@ mamba install --no-banner -y \
 # available.  `--no-build-isolation` ensures that any source packages use C++
 # libraries from conda-forge.
 pip install --no-build-isolation \
-      socketio-client \
       nclib \
       jupyterlab_hdf \
       lsst-efd-client \
