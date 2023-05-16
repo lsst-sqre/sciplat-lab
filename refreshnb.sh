@@ -31,7 +31,7 @@ for url in ${urllist}; do
     # We will try to do the right thing if it's r/w, but...at your own risk
     if ! [ -d "${dirname}" ]; then
         cd "${HOME}/notebooks" && \
-            git clone --depth 1 ${repo} -b ${branch} && \
+            (git clone --depth 1 ${repo} -b ${branch} >/dev/null 2>&1) && \
             chmod -R ugo-w "${dirname}"
     else
         cd "${dirname}"
@@ -62,19 +62,19 @@ for url in ${urllist}; do
             # If we have uncommited changes, stash, then we will pop back and
             #  apply after pull
             if ! git diff-files --quiet --ignore-submodules --; then
-                git stash
+                ( git stash > /dev/null 2>&1 )
                 dirty=1
             fi
             # Do we need to change branches?
             if [ "${otherbranch}" -ne 0 ]; then
-                git checkout ${branch}
+                ( git checkout ${branch} > /dev/null 2>&1 )
             fi
             git pull
             if [ "${otherbranch}" -ne 0 ]; then
-                git checkout ${currentbr}
+                ( git checkout ${currentbr} > /dev/null 2>&1 )
             fi
             if [ "${dirty}" -ne 0 ]; then
-                git stash apply
+                ( git stash apply > /dev/null 2>&1 )
             fi
             if [ "${rw}" -ne 0 ] || \
                    [ "${dirty}" -ne 0 ] || \
