@@ -89,22 +89,12 @@ function copy_lsst_dask() {
     cp "/opt/lsst/software/jupyterlab/lsst_dask.yml" "${HOME}/.config/dask/"
 }
 
-function clear_dotlocal() {
-    # Once every site is running a new enough nublado2 to have the new
-    # RESET_USER_ENV variable instead, this can be removed.
-    local dotlocal="${HOME}/.local"
-    local now=$(date +%Y%m%d%H%M%S)
-    if [ -d ${dotlocal} ]; then
-        mv ${dotlocal} ${dotlocal}.${now}
-    fi
-}
-
 function reset_user_env() {
     local now=$(date +%Y%m%d%H%M%S)
     local reloc="${HOME}/.user_env.${now}"
     mkdir -p "${reloc}"
     local moved=""
-    for i in local cache jupyter; do
+    for i in cache conda local jupyter; do
         if [ -d "${HOME}/.${i}" ]; then
             mv "${HOME}/.${i}" "${reloc}"
             moved="yes"
@@ -188,15 +178,6 @@ if [ -z "${USER}" ]; then
     USER="$(id -u -n)"
 fi
 export USER
-# Preserve compatibility between CLEAR_DOTLOCAL and RESET_USER_ENV
-if [ -n "${RESET_USER_ENV}" ]; then
-    # If the newer variable is present, use it instead.
-    CLEAR_DOTLOCAL=""
-fi
-# Clear $HOME/.local if requested
-if [ -n "${CLEAR_DOTLOCAL}" ]; then
-    clear_dotlocal
-fi
 if [ -n "${RESET_USER_ENV}" ]; then
     reset_user_env
 fi
