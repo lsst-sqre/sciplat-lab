@@ -19,23 +19,20 @@ fi
 # moved ahead.
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
                     | jq -r '.[0].version')
-# Do the rest of the installation; pin moto to overcome jsonschema version
-# breakage.
+# Do the rest of the installation.
 mamba install --no-banner -y \
-      "rubin-env-rsp==${rubin_env_ver}" \
-      "moto<4"
+      "rubin-env-rsp==${rubin_env_ver}"
 # Next, things on conda-forge not yet rolled into rubin-rsp-env
-mamba install --no-banner -y \
-      jupyterlab-variableinspector \
-      gh
+# mamba install --no-banner -y \
+# (Nothing at present)
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
 # lower-level layers have already installed the package (e.g. T&S may have
 # already installed lsst-efd-client), pinned to a version they need, we won't
 # upgrade it.  But if it isn't already installed, we'll just take the latest
-# available.
-pip install \
-      socketio-client \
+# available.  `--no-build-isolation` ensures that any source packages use C++
+# libraries from conda-forge.
+pip install --no-build-isolation \
       nclib \
       jupyterlab_hdf \
       lsst-efd-client \
