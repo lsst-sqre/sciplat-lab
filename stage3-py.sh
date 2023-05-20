@@ -27,15 +27,13 @@ mamba install --no-banner -y \
 # (Nothing at present)
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
-# lower-level layers have already installed the package (e.g. T&S may have
-# already installed lsst-efd-client), pinned to a version they need, we won't
-# upgrade it.  But if it isn't already installed, we'll just take the latest
-# available.  `--no-build-isolation` ensures that any source packages use C++
-# libraries from conda-forge.
+# lower-level layers have already installed the package, pinned to a version
+# they need, we won't upgrade it.  But if it isn't already installed, we'll
+# just take the latest available.  `--no-build-isolation` ensures that any
+# source packages use C++ libraries from conda-forge.
 pip install --no-build-isolation \
       nclib \
       jupyterlab_hdf \
-      lsst-efd-client \
       jupyter_firefly_extensions \
       lsst-rsp \
       rsp-jupyter-extensions \
