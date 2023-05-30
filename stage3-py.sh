@@ -20,11 +20,90 @@ fi
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
                     | jq -r '.[0].version')
 # Do the rest of the installation.
-mamba install --no-banner -y \
-     "rubin-env-rsp==${rubin_env_ver}"
+#mamba install --no-banner -y \
+#     "rubin-env-rsp==${rubin_env_ver}"
 
-# Next, things on conda-forge not yet rolled into rubin-rsp-env
-# (currently nothing)
+# Install rubin-rsp-env by hand for now.
+mamba install --no-banner -y \
+   astrowidgets \
+   awkward \
+   awkward-pandas \
+   black \
+   bokeh \
+   bqplot \
+   ciso8601 \
+   cloudpickle \
+   cookiecutter \
+   dash \
+   datashader \
+   fastparquet \
+   firefly-client \
+   ffmpeg \
+   freetype-py \
+   gcsfs \
+   geoviews \
+   gh \
+   ginga \
+   graphviz \
+   hdf5plugin \
+   holoviews \
+   hvplot \
+   imagemagick \
+   intake \
+   intake-parquet \
+   ipyevents \
+   ipykernel \
+   ipympl \
+   ipyvolume \
+   ipywidgets \
+   isort \
+   jedi \
+   jupyter \
+   jupyter-packaging \
+   jupyter-resource-usage \
+   jupyter-server-proxy \
+   jupyter_bokeh \
+   jupyterhub \
+   'jupyterlab>=4,<5' \
+   jupyterlab_execute_time \
+   jupyterlab_iframe \
+   jupyterlab_widgets \
+   jupyterlab-h5web \
+   jupyterlab-variableinspector \
+   lsst-efd-client \
+   mamba \
+   mypy \
+   mysqlclient \
+   nb_black \
+   nbconvert-webpdf \
+   nbval \
+   nodejs \
+   panel \
+   papermill \
+   paramnb \
+   partd \
+   pep8 \
+   plotly \
+   pre-commit \
+   pyflakes \
+   pypandoc \
+   pyshp \
+   python-snappy \
+   python-socketio \
+   pythreejs \
+   pyviz_comms \
+   pyvo \
+   ripgrep \
+   sidecar \
+   snappy \
+   terminado \
+   toolz \
+   wget \
+   xarray \
+   yarn \
+   hatchling \
+   hatch-jupyter-builder \
+   hatch-nodejs-version   
 
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
@@ -32,13 +111,14 @@ mamba install --no-banner -y \
 # they need, we won't upgrade it.  But if it isn't already installed, we'll
 # just take the latest available.  `--no-build-isolation` ensures that any
 # source packages use C++ libraries from conda-forge.
+#
+# nbdime is on conda-forge, but not a JL4-compatible one just yet (nor is
+# there a non-prelease version on pypi yet)
+pip install --pre nbdime
 pip install --no-build-isolation \
-      nclib \
-      jupyterlab_hdf \
-      'jupyter_firefly_extensions<4' \
-      lsst-rsp \
-      'rsp-jupyter-extensions<1' \
-      nbconvert[webpdf]
+    'jupyter-firefly-extensions>=4.0.0,<5' \
+    lsst-rsp \
+    git+https://github.com/lsst-sqre/rsp-jupyter-extensions
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
