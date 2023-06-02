@@ -43,10 +43,11 @@ ifeq ($(tag),)
     $(error tag must be set)
 endif
 
-# By default, we will push to Docker Hub and GAR.  Eventually we expect
-# ghcr.io to replace Docker Hub.
+# By default, we will push to Docker Hub, Google Artifact Registry,
+# and GitHub Container Registry.  We expect to eventually drop Docker Hub.
+
 ifeq ($(image),)
-    image = docker.io/lsstsqre/sciplat-lab,us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab
+    image = docker.io/lsstsqre/sciplat-lab,us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab
 endif
 
 ifeq ($(input),)
