@@ -14,8 +14,8 @@ on:
       image:
         description: 'fully-qualified URI for output Docker image'
         required: false
-        default: 'docker.io/lsstsqre/sciplat-lab,us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab'
-        # someday we will want to add 'ghcr.io/lsst-sqre/sciplat-lab'
+        default: 'us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab,docker.io/lsstsqre/sciplat-lab'
+        # someday we will want to remove Docker Hub.
       push:
         description: 'push resulting image; make empty or set to a YAML-false string to build but not push'
         required: false
