@@ -61,7 +61,7 @@ for url in ${urllist}; do
             fi
             # If we have uncommited changes, stash, then we will pop back and
             #  apply after pull
-            if ! git diff-files --quiet --ignore-submodules --; then
+            if [ -n "$(git status -s)" ]; then
                 ( git stash > /dev/null 2>&1 )
                 dirty=1
             fi
