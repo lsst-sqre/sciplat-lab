@@ -19,7 +19,7 @@ fi
 for url in ${urllist}; do
     branch=$(echo ${url} | cut -d '@' -f 2)
     # Only use default_branch if branch is not specified in the URL
-    if [ "${branch}" == "${url}" ]; then
+    if [ "${branch}" = "${url}" ]; then
         branch=${default_branch}
     fi
     repo=$(echo ${url} | cut -d '@' -f 1)
@@ -61,9 +61,17 @@ for url in ${urllist}; do
             fi
             # If we have uncommited changes, stash, then we will pop back and
             #  apply after pull
-            if [ -n "$(git status -s)" ]; then
-                ( git stash > /dev/null 2>&1 )
-                dirty=1
+	    st=$(git status --porcelain=v2)
+            if [ -n "${st}" ]; then
+		# If the only thing wrong is the existence of the README
+		# then we should just delete it, because it probably dates
+		# to when we were doing the test wrong.
+		if [ "${st}" = '? 00_WARNING_README.md' ]; then
+		    rm 00_WARNING_README.md
+		else
+                    ( git stash > /dev/null 2>&1 )
+                    dirty=1
+		fi
             fi
             # Do we need to change branches?
             if [ "${otherbranch}" -ne 0 ]; then
