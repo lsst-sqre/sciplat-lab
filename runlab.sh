@@ -323,7 +323,7 @@ cmd="python3 -s -m jupyter labhub \
      --MappingKernelManager.default_kernel_name=lsst \
      --TerminalManager.cull_inactive_timeout=${CULL_TERMINAL_INACTIVE_TIMEOUT} \
      --TerminalManager.cull_interval=${CULL_TERMINAL_INTERVAL} \
-     --LabApp.check_for_updates_class='jupyterlab.NeverCheckForUpdate'"
+     --LabApp.check_for_updates_class=jupyterlab.NeverCheckForUpdate"
 
 if [ -n "${DEBUG}" ]; then
     cmd="${cmd} --debug"
