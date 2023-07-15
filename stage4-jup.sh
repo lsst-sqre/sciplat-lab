@@ -3,23 +3,15 @@ set -e
 source ${LOADRSPSTACK}
 
 # Server, notebook, and lab extensions
-svxt="jupyter_firefly_extensions \
-      jupyterlab_iframe"
-nbxt="widgetsnbextension"
-lbxt="ipyvolume \
-      ipyevents \
-      jupyter_firefly_extensions \
-      jupyterlab_iframe"
+svxt="jupyter_firefly_extensions"
+# No notebook extensions
+lbxt="jupyter_firefly_extensions"
 
 # Don't understand why
 #  jupyter serverextension enable panel.io.jupyter_server_extension
 # fails here, but we'll just put it into the jupyter_server_config.json
 for s in $svxt; do
     jupyter serverextension enable ${s} --py --sys-prefix
-done
-for n in $nbxt; do
-    jupyter nbextension install ${n} --py --sys-prefix
-    jupyter nbextension enable ${n} --py  --sys-prefix
 done
 for l in ${lbxt}; do
     jupyter labextension install ${l} --no-build
