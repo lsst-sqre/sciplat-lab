@@ -20,94 +20,11 @@ fi
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
                     | jq -r '.[0].version')
 # Do the rest of the installation.
-# FIXME commented out until we can remove jupyter-dash from rubin-env-rsp
-# mamba install --no-banner -y \
-#      "rubin-env-rsp==${rubin_env_ver}"
+mamba install --no-banner -y \
+     "rubin-env-rsp==${rubin_env_ver}"
 
 # Next, things on conda-forge not yet rolled into rubin-rsp-env
-# (currently everything while I'm troubleshooting).
-# FIXME see above.
-# Once that lands, we install rubin-env-rsp and none of the following.
-mamba install --no-banner -y \
-       astroplan \
-       'astrowidgets>=0.3' \
-       awkward \
-       awkward-numba \
-       black \
-       bokeh \
-       bqplot \
-       ciso8601 \
-       cloudpickle \
-       cookiecutter \
-       'dash>=2.11' \
-       dask \
-       dask-kubernetes \
-       dask_labextension \
-       datashader \
-       distributed \
-       fastparquet \
-       ffmpeg \
-       freetype-py \
-       gcsfs \
-       geoviews \
-       gh \
-       ginga \
-       graphviz \
-       holoviews \
-       hvplot \
-       imagemagick \
-       intake \
-       intake-parquet \
-       ipyevents \
-       ipykernel \
-       ipympl \
-       ipyvolume \
-       ipywidgets \
-       'isort!=5.11.0' \
-       jedi \
-       jupyter \
-       jupyter-packaging \
-       jupyter-resource-usage \
-       jupyter-server-proxy \
-       jupyter_bokeh \
-       jupyterhub \
-       'jupyterlab>=3.6,<4' \
-       'jupyterlab_execute_time>=2,<3' \
-       jupyterlab_iframe \
-       jupyterlab_widgets \
-       jupyterlab-variableinspector \
-       lsst-efd-client \
-       mamba \
-       mypy \
-       mysqlclient \
-       nb_black \
-       nbconvert-webpdf \
-       nbdime \
-       nbval \
-       'nodejs>=16' \
-       'panel>=0.12.1' \
-       papermill \
-       paramnb \
-       partd \
-       pep8 \
-       plotly \
-       pre-commit \
-       pyflakes \
-       pypandoc \
-       pyshp \
-       python-snappy \
-       python-socketio \
-       pythreejs \
-       pyviz_comms \
-       pyvo \
-       ripgrep \
-       sidecar \
-       snappy \
-       terminado \
-       toolz \
-       wget \
-       xarray \
-       yarn
+# (currently nothing)
 
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
