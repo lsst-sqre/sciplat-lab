@@ -158,7 +158,7 @@ build: image
 image: dockerfile
 	img=$$(echo $(image) | cut -d ',' -f 1) && \
 	more=$$(echo $(image) | cut -d ',' -f 2- | tr ',' ' ') && \
-	$(DOCKER) build ${platform} --progress=plain -t $${img}:$(version) . && \
+	DOCKER_BUILDKIT=0 $(DOCKER) build ${platform} -t $${img}:$(version) . && \
 	for m in $${more}; do \
 	    $(DOCKER) tag $${img}:$(version) $${m}:$(version) ; \
 	done
