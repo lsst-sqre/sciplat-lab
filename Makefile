@@ -59,6 +59,10 @@ endif
 
 # Some day we might use a different build tool.  If you have a new enough
 #  docker, you probably want to set DOCKER_BUILDKIT in your environment.
+#  ... except that as of August 6, 2023, the new builder (which you get with
+#  DOCKER_BUILDKIT=1, or by default as of that date) just hangs at the
+#  image-writing stage on GitHub Actions.  So we're going to work around it,
+#  at least until legacy build support is removed.
 DOCKER := docker
 
 # Force to simply-expanded variables, for when we add the supplementary tag.
@@ -155,6 +159,7 @@ push: image
 # I keep getting this wrong, so make it work either way.
 build: image
 
+# Force DOCKER_BUILDKIT off, to appease GitHub Actions (6 Aug 2023)
 image: dockerfile
 	img=$$(echo $(image) | cut -d ',' -f 1) && \
 	more=$$(echo $(image) | cut -d ',' -f 2- | tr ',' ' ') && \
