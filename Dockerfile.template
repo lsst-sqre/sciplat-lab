@@ -52,16 +52,13 @@ COPY git-credentials /etc/skel/.git-credentials
 COPY user_setups /etc/skel/notebooks/.user_setups
 COPY lsst_kernel.json modify_settings.py \
       lsstlaunch.bash runlab.sh refreshnb.sh \
-      prepuller.sh lsstwrapdask.bash lsst_dask.yml \
-      20-logging.py confmerge.py \
+      prepuller.sh 20-logging.py confmerge.py \
       00_WARNING_README.md.template warning-tutorial-notebooks.md \
       ${jl}/
 COPY noninteractive /opt/lsst/software/jupyterlab/noninteractive/     
 # Mount configmap at ^^ command/command.json
 COPY stage5-ro.sh ${BLD}
 RUN  ${BLD}/stage5-ro.sh
-# Add dask-scheduler shim
-COPY dask-scheduler-shim /usr/local/bin/dask-scheduler
 # Overwrite Stack Container definitions with more-accurate-for-us ones
 ENV  DESCRIPTION="Rubin Science Platform Notebook Aspect"
 ENV  SUMMARY="Rubin Science Platform Notebook Aspect"
