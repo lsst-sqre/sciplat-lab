@@ -12,8 +12,6 @@ SETTINGS_DIR = (
 )
 SETTINGS_FILE = SETTINGS_DIR + "/tracker.jupyterlab-settings"
 NEW_MIN = 10000
-WS_DIR = os.environ["HOME"] + "/.jupyter/lab/workspaces"
-WS_FILES = glob.glob(WS_DIR + "/*.jupyterlab-workspace")
 logging.basicConfig()
 LOGGER = logging.getLogger()
 
