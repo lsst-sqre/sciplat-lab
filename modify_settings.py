@@ -12,15 +12,12 @@ SETTINGS_DIR = (
 )
 SETTINGS_FILE = SETTINGS_DIR + "/tracker.jupyterlab-settings"
 NEW_MIN = 10000
-WS_DIR = os.environ["HOME"] + "/.jupyter/lab/workspaces"
-WS_FILES = glob.glob(WS_DIR + "/*.jupyterlab-workspace")
 logging.basicConfig()
 LOGGER = logging.getLogger()
 
 
 def main() -> None:
     increase_log_limit()
-    remove_dask_url()
 
 
 def increase_log_limit() -> None:
@@ -52,26 +49,6 @@ def enforce_limits(settings: dict) -> dict:
 def write_limits_file(settings: dict) -> None:
     with open(SETTINGS_FILE, "w") as f:
         json.dump(settings, f, sort_keys=True, indent=4)
-
-
-def remove_dask_url() -> None:
-    for fn in WS_FILES:
-        process_ws_file(fn)
-
-
-def process_ws_file(fn: str) -> None:
-    with open(fn) as f:
-        try:
-            contents = json.load(f)
-        except (OSError, json.decoder.JSONDecodeError) as e:
-            return  # Skip file
-    try:
-        del contents["data"]["dask-dashboard-launcher"]["url"]
-    except KeyError:
-        return  # if it ain't there, it ain't a problem
-    LOGGER.info(f"Removing Dask dashboard URL from workspace file {fn}")
-    with open(fn, "w") as f:
-        json.dump(contents, f, separators=(",", ":"))
 
 
 if __name__ == "__main__":

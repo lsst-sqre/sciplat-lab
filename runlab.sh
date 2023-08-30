@@ -84,11 +84,6 @@ function manage_access_token() {
     fi
 }
 
-function copy_lsst_dask() {
-    mkdir -p "${HOME}/.config/dask"
-    cp "/opt/lsst/software/jupyterlab/lsst_dask.yml" "${HOME}/.config/dask/"
-}
-
 function reset_user_env() {
     local now=$(date +%Y%m%d%H%M%S)
     local reloc="${HOME}/.user_env.${now}"
@@ -148,13 +143,6 @@ function copy_etc_skel() {
             cp -a ${i} ${hb}
         fi
     done
-}
-
-function start_dask_worker() {
-    cmd="/opt/lsst/software/jupyterlab/lsstwrapdask.bash"
-    echo "Starting dask worker: ${cmd}"
-    exec ${cmd}
-    exit 0 # Not reached
 }
 
 function start_noninteractive() {
@@ -272,29 +260,17 @@ fi
 FIREFLY_HTML="slate.html"
 export FIREFLY_URL FIREFLY_HTML
 export JUPYTER_PREFER_ENV_PATH="no"
-if [ -z "${JUPYTERHUB_SERVICE_PREFIX}" ]; then
-    # dask.distributed gets cranky if it's not there (since it is used
-    #  in lsst_dask.yml); it will be for interactive use, and whether
-    #  or not the proxy dashboard URL is correct doesn't matter in a
-    #  noninteractive context.
-    JUPYTERHUB_SERVICE_PREFIX="${JUPYTERHUB_BASE_URL}user/${JUPYTERHUB_USER}"
-    export JUPYTERHUB_SERVICE_PREFIX
-fi
-# Fetch/update magic notebook.  We want this in interactive, noninteractive,
-#  and Dask pods.  We must have ${HOME} mounted but that is the case for
-#  all of those scenarios.
+# Fetch/update magic notebook.  We want this in interactive and noninteractive
+#  pods.  We must have ${HOME} mounted but that is the case for both of those
+# scenarios.
 . /opt/lsst/software/jupyterlab/refreshnb.sh
 eups admin clearCache 
-if [ -n "${DASK_WORKER}" ]; then
-    start_dask_worker
-    exit 0 # Not reached
-elif [ -n "${NONINTERACTIVE}" ]; then
+if [ -n "${NONINTERACTIVE}" ]; then
     start_noninteractive
     exit 0 # Not reached
 else
-    # All of these tasks should only be run if we are an interactive lab,
-    # rather than a noninteractive lab or a Dask worker.
-    copy_lsst_dask
+    # These tasks should only be run if we are an interactive lab rather than
+    # a noninteractive lab.
     modify_settings_files
     manage_access_token
 fi
