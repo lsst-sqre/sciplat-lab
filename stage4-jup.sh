@@ -1,8 +1,10 @@
 #!/bin/sh
 set -e
 source ${LOADRSPSTACK}
-# File sharing doesn't work in the RSP environment, so remove the extension.
+# File sharing doesn't work in the RSP environment; remove the extension.
 jupyter labextension disable "@jupyterlab/filebrowser-extension:share-file"
+# And Jupyter News is just obnoxious
+jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
 
 # List installed labextensions and put them into a format we could consume
 #  for installation
