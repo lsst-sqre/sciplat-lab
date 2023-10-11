@@ -35,7 +35,7 @@ mamba install --no-banner -y \
 pip install --no-build-isolation \
       nclib \
       jupyterlab_hdf \
-      jupyter_firefly_extensions \
+      'jupyter_firefly_extensions<4' \
       lsst-rsp \
       rsp-jupyter-extensions \
       nbconvert[webpdf]
