@@ -14,8 +14,7 @@ on:
       image:
         description: 'fully-qualified URI for output Docker image'
         required: false
-        default: 'docker.io/lsstsqre/sciplat-lab,us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab'
-        # Someday we will want to add 'ghcr.io/lsst-sqre/sciplat-lab'
+        default: 'us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab,docker.io/lsstsqre/sciplat-lab'
 
 # We need actions/write if we want to do a GH App, and we need
 # packages/write to push to ghcr.io with GITHUB_TOKEN (currently not
