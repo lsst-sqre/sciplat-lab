@@ -37,7 +37,7 @@ pip install --no-build-isolation \
       jupyterlab_hdf \
       'jupyter_firefly_extensions<4' \
       lsst-rsp \
-      rsp-jupyter-extensions \
+      'rsp-jupyter-extensions<1' \
       nbconvert[webpdf]
 
 # Add stack kernel
