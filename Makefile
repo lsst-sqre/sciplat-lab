@@ -75,7 +75,7 @@ image := $(image)
 version := $(tag)
 version := $(version:v%=r%)
 
-release_branch := prod
+release_branch := main
 branch := $(shell git rev-parse --abbrev-ref HEAD)
 
 # if we are not on the release branch, then force supplementary to be set
