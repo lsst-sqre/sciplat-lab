@@ -45,8 +45,12 @@ mamba install --no-banner -y \
    gh \
    ginga \
    graphviz \
+   hatch-jupyter-builder \
+   hatch-nodejs-version \
+   hatchling \
    hdf5plugin \
    holoviews \
+   httpx \
    hvplot \
    imagemagick \
    intake \
@@ -100,10 +104,7 @@ mamba install --no-banner -y \
    toolz \
    wget \
    xarray \
-   yarn \
-   hatchling \
-   hatch-jupyter-builder \
-   hatch-nodejs-version   
+   yarn
 
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
