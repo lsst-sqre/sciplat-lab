@@ -38,7 +38,6 @@ mamba install --no-banner -y \
    'dash>=2.11' \
    datashader \
    fastparquet \
-   firefly-client \
    ffmpeg \
    freetype-py \
    gcsfs \
