@@ -25,7 +25,8 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 
 # Install rubin-rsp-env by hand for now.
 mamba install --no-banner -y \
-   astrowidgets \
+   astroplan \
+   'astrowidgets>=0.3' \
    awkward \
    awkward-pandas \
    black \
@@ -34,7 +35,7 @@ mamba install --no-banner -y \
    ciso8601 \
    cloudpickle \
    cookiecutter \
-   dash \
+   'dash>=2.11' \
    datashader \
    fastparquet \
    firefly-client \
@@ -43,7 +44,7 @@ mamba install --no-banner -y \
    gcsfs \
    geoviews \
    gh \
-   ginga \
+   'ginga>=3' \
    graphviz \
    hatch-jupyter-builder \
    hatch-nodejs-version \
@@ -60,7 +61,7 @@ mamba install --no-banner -y \
    ipympl \
    ipyvolume \
    ipywidgets \
-   isort \
+   'isort!=5.11.0' \
    jedi \
    jupyter \
    jupyter-packaging \
@@ -81,8 +82,8 @@ mamba install --no-banner -y \
    nb_black \
    nbconvert-webpdf \
    nbval \
-   nodejs \
-   panel \
+   'nodejs>=16' \
+   'panel>=0.12.1' \
    papermill \
    paramnb \
    partd \
