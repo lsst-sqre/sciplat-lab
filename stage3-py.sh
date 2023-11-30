@@ -30,13 +30,12 @@ mamba install --no-banner -y \
 # just take the latest available.  `--no-build-isolation` ensures that any
 # source packages use C++ libraries from conda-forge.
 #
-# nbdime is on conda-forge, but not a JL4-compatible one just yet (nor is
-# there a non-prelease version on pypi yet)
-pip install --pre nbdime
+
 pip install --no-build-isolation \
     'jupyter-firefly-extensions>=4.0.0,<5' \
     lsst-rsp \
-    git+https://github.com/lsst-sqre/rsp-jupyter-extensions
+    git+https://github.com/lsst-sqre/rsp-jupyter-extensions \
+    git+https://github.com/stropy/pyvo.git@7682a1809cb2169cc2ffd9313feb6a4abd7f7e37  # Works with astropy 6 -- remove when pyvo 1.4.3 is out
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
