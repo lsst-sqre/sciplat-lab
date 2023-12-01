@@ -29,16 +29,12 @@ mamba install --no-banner -y \
 # they need, we won't upgrade it.  But if it isn't already installed, we'll
 # just take the latest available.  `--no-build-isolation` ensures that any
 # source packages use C++ libraries from conda-forge.
-#
-
-mamba install --no-banner -y \
-      "openssl<3.2.0"
 
 pip install --no-build-isolation \
     'jupyter-firefly-extensions>=4.0.0,<5' \
     lsst-rsp \
     git+https://github.com/lsst-sqre/rsp-jupyter-extensions \
-    git+https://github.com/astropy/pyvo.git@7682a1809cb2169cc2ffd9313feb6a4abd7f7e37  # Works with astropy 6 -- remove when pyvo 1.4.3 is out
+    git+https://github.com/astropy/pyvo.git@7682a1809cb2169cc2ffd9313feb6a4abd7f7e37  # Works with astropy 6 -- remove when pyvo 1.5 is out
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
