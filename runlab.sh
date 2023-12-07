@@ -96,13 +96,12 @@ function reset_user_env() {
             moved="yes"
         fi
     done
-    # Files
-    for i in user_setups; do
-        if [ -d "${HOME}/.${i}" ]; then
-            mv "${HOME}/.${i}" "${reloc}"
-            moved="yes"
-        fi
-    done
+    # Files; they're not necessarily at the top level
+    if [ -f "${HOME}/notebooks/.user_setups" ]; then
+	mkdir -p "${reloc}/notebooks"
+        mv "${HOME}/notebooks/.user_setups" "${reloc}/notebooks/user_setups"
+        moved="yes"
+    fi
     # If nothing was actually relocated, then do not keep the reloc directory
     if [ -z "${moved}" ]; then
         rmdir "${reloc}"
