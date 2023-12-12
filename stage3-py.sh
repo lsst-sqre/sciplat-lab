@@ -32,7 +32,7 @@ mamba install --no-banner -y \
 
 pip install --no-build-isolation \
     'jupyter-firefly-extensions>=4.0.0,<5' \
-    lsst-rsp \
+    git+https://github.com/lsst-sqre/lsst-rsp \
     git+https://github.com/lsst-sqre/rsp-jupyter-extensions \
     git+https://github.com/astropy/pyvo.git@7682a1809cb2169cc2ffd9313feb6a4abd7f7e37  # Works with astropy 6 -- remove when pyvo 1.5 is out
 
