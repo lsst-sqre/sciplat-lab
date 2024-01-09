@@ -33,7 +33,7 @@ mamba install --no-banner -y \
 pip install --no-build-isolation \
     rsp-jupyter-extensions \
     'jupyter-firefly-extensions>=4.0.0,<5' \
-    git+https://github.com/lsst-sqre/lsst-rsp
+    lsst-rsp
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
