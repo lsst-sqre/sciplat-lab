@@ -21,7 +21,11 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
                     | jq -r '.[0].version')
 # Do the rest of the installation.
 mamba install --no-banner -y \
-     "rubin-env-rsp==${rubin_env_ver}"
+      "rubin-env-rsp==${rubin_env_ver}"
+
+# Push JH
+
+mamba install --no-banner -y jupyterhub==4.1.0
 
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
