@@ -23,6 +23,10 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 mamba install --no-banner -y \
      "rubin-env-rsp==${rubin_env_ver}"
 
+# FIXME XSRF handling
+mamba install --no-banner -y \
+      "jupyterhub=4.1.1"
+
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
 # lower-level layers have already installed the package, pinned to a version
