@@ -38,6 +38,11 @@ mamba install --no-banner -y \
 # just take the latest available.  `--no-build-isolation` ensures that any
 # source packages use C++ libraries from conda-forge.
 
+# Jupyterhub 4.1.5 breaks Firefly displays.  Probably somehow XSRF related
+mamba install --no-banner -y \
+      "jupyterhub!=4.1.5" \
+      "jupyterhub-base!=4.1.5"
+
 pip install --no-build-isolation \
     rsp-jupyter-extensions \
     'jupyter-firefly-extensions>=4.0.0,<5' \
