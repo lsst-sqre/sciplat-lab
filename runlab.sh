@@ -45,8 +45,7 @@ export LOADRSPSTACK
 source ${LOADRSPSTACK}
 source /etc/profile.d/local05-path.sh
 
-# Now we transfer control to the Python entrypoint "runlab", defined
-# as part of lsst.rsp (in the lsst-rsp package).
+# Now we transfer control to the Python entrypoint "launch-rubin-jupyterlab",
+# defined as part of lsst.rsp (in the lsst-rsp package).
 
-exec runlab
-
+exec launch-rubin-jupyterlab
