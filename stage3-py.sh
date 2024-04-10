@@ -24,12 +24,12 @@ mamba install --no-banner -y \
      "rubin-env-rsp==${rubin_env_ver}"
 
 # JupyterHub is flailing wildly with respect to XSRF.  4.1.5 doesn't permit
-# us to get a Firefly window.  I'm going to be optimistic for right now and
-# try just not 4.1.5 rather than pinning it back.
+# us to get a Firefly window.
+# Pin back to 4.1.4 and test new releases as they happen.
 
 mamba install --no-banner -y \
-      "jupyterhub!=4.1.5" \
-      "jupyterhub-base!=4.1.5"
+      "jupyterhub==4.1.4" \
+      "jupyterhub-base==4.1.4"
 
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
