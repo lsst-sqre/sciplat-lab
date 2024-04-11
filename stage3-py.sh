@@ -54,7 +54,7 @@ pip install uv
 uv pip install --no-build-isolation \
     rsp-jupyter-extensions \
     'jupyter-firefly-extensions>=4.0.0,<5' \
-    'lsst-rsp>=0.5.0' \
+    'lsst-rsp>=0.5.1' \
     structlog \
     'symbolicmode<3'
 
