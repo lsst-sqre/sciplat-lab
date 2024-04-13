@@ -50,12 +50,11 @@ COPY pythonrc /etc/skel/.pythonrc
 COPY gitconfig /etc/skel/.gitconfig
 COPY git-credentials /etc/skel/.git-credentials
 COPY user_setups /etc/skel/notebooks/.user_setups
-COPY lsst_kernel.json modify_settings.py \
-      lsstlaunch.bash runlab.sh refreshnb.sh \
-      prepuller.sh 20-logging.py confmerge.py \
+COPY lsst_kernel.json lsstlaunch.bash runlab.sh 20-logging.py \
       ${jl}/
-COPY noninteractive /opt/lsst/software/jupyterlab/noninteractive/     
-# Mount configmap at ^^ command/command.json
+# If running noninteractively, configuration configmap must be mounted at
+# /opt/lsst/software/jupyterlab/noninteractive/command/command.json
+# and env. var NONINTERACTIVE must be set
 COPY stage5-ro.sh ${BLD}
 RUN  ${BLD}/stage5-ro.sh
 # Overwrite Stack Container definitions with more-accurate-for-us ones

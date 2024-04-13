@@ -11,9 +11,12 @@ set -e
 # mamba create --name ${rspname} --clone ${LSST_CONDA_ENV_NAME}
 #
 source ${LOADRSPSTACK}
+
+# Mamba is compatible with conda, but much faster
 if [ -z "$(which mamba)" ]; then
     conda install -y mamba
 fi
+
 # Never allow the installation to upgrade rubin_env.  Generally enforcing
 # the pin is only needed for releases, where the current version may have
 # moved ahead.
@@ -26,6 +29,9 @@ mamba install --no-banner -y \
 # JupyterHub is flailing wildly with respect to XSRF.  4.1.5 doesn't permit
 # us to get a Firefly window.
 # Pin back to 4.1.4 and test new releases as they happen.
+# We believe we have determined why this happens; as of 11 April 2024 there
+# is a new Firefly release in the works, and once that is tested we can
+# remove the pins.
 
 mamba install --no-banner -y \
       "jupyterhub==4.1.4" \
@@ -38,10 +44,19 @@ mamba install --no-banner -y \
 # just take the latest available.  `--no-build-isolation` ensures that any
 # source packages use C++ libraries from conda-forge.
 
-pip install --no-build-isolation \
+# As with conda->mamba, uv is compatible but much faster.  It matters less
+# here, of course, because there are many fewer pip-installed packages.
+pip install uv
+
+# "--no-build-isolation" means we're also responsible for the dependencies
+# not already provided by something in the conda env.  In this case,
+# structlog and symbolicmode from lsst-rsp.
+uv pip install --no-build-isolation \
     rsp-jupyter-extensions \
     'jupyter-firefly-extensions>=4.0.0,<5' \
-    lsst-rsp
+    'lsst-rsp>=0.5.1' \
+    structlog \
+    'symbolicmode<3'
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
@@ -50,10 +65,11 @@ python3 -m ipykernel install --name 'LSST'
 stacktop="/opt/lsst/software/stack/conda/current"
 rm -rf ${stacktop}/envs/${LSST_CONDA_ENV_NAME}/share/jupyter/kernels/python3
 
-# Clear mamba and pip caches
+# Clear mamba, pip, and uv caches
 mamba clean -a -y --no-banner
 rm -rf /root/.cache/pip
+uv cache clean
 
 # Create package version docs.
-pip3 freeze > ${verdir}/requirements-stack.txt
+uv pip freeze > ${verdir}/requirements-stack.txt
 mamba env export > ${verdir}/conda-stack.yml

@@ -15,9 +15,6 @@ if [ -d /home/lsst ]; then
     mv /home/lsst /home/lsst_lcl
 fi
 
-# Flag to signal that we can work without sudo enabled
-echo "OK" > ${jl}/no_sudo_ok
-
 # Passwd and group are injected as secrets.  We don't need their shadow
 # variants since they will never be used for authentication, and we definitely
 # do not need backups of the passwd/group files.  Nor do we need the
