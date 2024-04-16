@@ -28,14 +28,7 @@ mamba install --no-banner -y \
 
 # JupyterHub is flailing wildly with respect to XSRF.  4.1.5 doesn't permit
 # us to get a Firefly window.
-# Pin back to 4.1.4 and test new releases as they happen.
-# We believe we have determined why this happens; as of 11 April 2024 there
-# is a new Firefly release in the works, and once that is tested we can
-# remove the pins.
-
-mamba install --no-banner -y \
-      "jupyterhub==4.1.4" \
-      "jupyterhub-base==4.1.4"
+# Testing with a new Firefly extension branch.
 
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
@@ -53,7 +46,7 @@ pip install uv
 # structlog and symbolicmode from lsst-rsp.
 uv pip install --no-build-isolation \
     rsp-jupyter-extensions \
-    'jupyter-firefly-extensions>=4.0.0,<5' \
+    'git+https://github.com/Caltech-IPAC/jupyter_firefly_extensions.git@FIREFLY-1460-server-connection' \
     'lsst-rsp>=0.5.1' \
     structlog \
     'symbolicmode<3'
