@@ -11,7 +11,7 @@ function reset_user_env() {
     mkdir -p "${reloc}"
     local moved=""
     # Dirs
-    for i in cache conda local jupyter; do
+    for i in cache conda eups local jupyter; do
         if [ -d "${HOME}/.${i}" ]; then
             mv "${HOME}/.${i}" "${reloc}"
             moved="yes"
