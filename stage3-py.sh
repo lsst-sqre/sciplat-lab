@@ -26,9 +26,10 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 mamba install --no-banner -y \
      "rubin-env-rsp==${rubin_env_ver}"
 
-# JupyterHub is flailing wildly with respect to XSRF.  4.1.5 doesn't permit
-# us to get a Firefly window.
-# Testing with a new Firefly extension branch.
+# As with conda->mamba, uv is compatible with pip but much faster.  It
+# matters less here, of course, because there are many fewer
+# pip-installed packages.
+pip install uv
 
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
@@ -37,16 +38,12 @@ mamba install --no-banner -y \
 # just take the latest available.  `--no-build-isolation` ensures that any
 # source packages use C++ libraries from conda-forge.
 
-# As with conda->mamba, uv is compatible but much faster.  It matters less
-# here, of course, because there are many fewer pip-installed packages.
-pip install uv
-
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # structlog and symbolicmode from lsst-rsp.
 uv pip install --no-build-isolation \
     rsp-jupyter-extensions \
-    'git+https://github.com/Caltech-IPAC/jupyter_firefly_extensions.git@FIREFLY-1460-server-connection' \
+    'jupyter-firefly-extensions>=4.1.1' \
     'lsst-rsp>=0.5.1' \
     structlog \
     'symbolicmode<3'
@@ -60,7 +57,7 @@ rm -rf ${stacktop}/envs/${LSST_CONDA_ENV_NAME}/share/jupyter/kernels/python3
 
 # Clear mamba, pip, and uv caches
 mamba clean -a -y --no-banner
-rm -rf /root/.cache/pip
+pip cache purge
 uv cache clean
 
 # Create package version docs.
