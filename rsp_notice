@@ -14,10 +14,3 @@ LSST iPython kernel, create a sourceable shell fragment in:
         ${HOME}/notebooks/.user_setups
 
 and it will be sourced during kernel startup.
-
-To create a Rubin Observatory environment in a terminal session and set up
-the full set of packages:
-
-        setup lsst_distrib
-
-
