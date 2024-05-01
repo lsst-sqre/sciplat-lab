@@ -28,21 +28,18 @@ else
 		     scriptqueue externalscripts ; do
 		setup ts_${i} -t current
             done
-	    for i in lsst_sitcom firefly; do
-		setup $i
-	    done
+	    setup lsst_sitcom
+	    setup display_firefly
 	    ;;
 	staff)
             source /opt/lsst/software/stack/loadLSST.bash
-	    for i in lsst_sitcom firefly; do
-		setup $i
-	    done
+	    setup lsst_sitcom
+	    setup display_firefly
 	    ;;
 	*)  # Should be "science", and let's make that the default case.
             source /opt/lsst/software/stack/loadLSST.bash
-	    for i in lsst_distrib display_firefly ; do
-		setup $i
-	    done
+	    setup lsst_distrib
+	    setup display_firefly
 	    ;;
     esac
 fi
