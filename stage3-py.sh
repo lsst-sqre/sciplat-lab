@@ -23,13 +23,95 @@ fi
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
                     | jq -r '.[0].version')
 # Do the rest of the installation.
+#mamba install --no-banner -y \
+#      "rubin-env-rsp==${rubin_env_ver}"
+
 mamba install --no-banner -y \
-      "rubin-env-rsp==${rubin_env_ver}"
-
-# qtpdf?
-mamba uninstall --no-banner -y nbconvert-webpdf
-
-mamba install --no-banner -y nbconvert-qtpdf
+        astroplan \
+        'astrowidgets>=0.3' \
+        awkward \
+        awkward-pandas \
+        black \
+        bokeh \
+        bqplot \
+        ciso8601 \
+        cloudpickle \
+        cookiecutter \
+        'dash>=2.11' \
+        dask-core \
+        datashader \
+        fastparquet \
+        ffmpeg \
+        freetype-py \
+        gcsfs \
+        geoviews \
+        gh \
+        'ginga>=3' \
+        graphviz \
+        hatch-jupyter-builder \
+        hatch-nodejs-version \
+	hatchling \
+	hdf5plugin \
+	holoviews \
+	httpie \
+	httpx \
+	hvplot \
+	imagemagick \
+	intake \
+	intake-parquet \
+	ipyevents \
+	ipykernel \
+	ipympl \
+	ipyvolume \
+	ipywidgets \
+	'isort!=5.11.0' \
+	jedi \
+	jupyter \
+	jupyter-packaging \
+	jupyter-resource-usage \
+	jupyter-server-proxy \
+	jupyter_bokeh \
+	jupyterhub \
+	'jupyterlab>=4,<5' \
+	jupyterlab_execute_time \
+	jupyterlab_iframe \
+	jupyterlab_widgets \
+	jupyterlab-variableinspector \
+	lsst-efd-client \
+	mypy \
+	mysqlclient \
+	nb_black \
+        nbconvert-qtpdf \
+	nbdime \
+	nbval \
+	'nodejs>=16' \
+	'panel>=0.12.1' \
+	papermill \
+	paramnb \
+	partd \
+	pep8 \
+	plotly \
+	pre-commit \
+	pyflakes \
+	pypandoc \
+	pyshp \
+	python-snappy \
+	python-socketio \
+	pythreejs \
+	pyviz_comms \
+	pyvo \
+	ripgrep \
+	rubin-scheduler \
+	rubin-sim \
+	sbpy \
+	schedview \
+	sidecar \
+	snappy \
+	terminado \
+	toolz \
+	wget \
+	xarray \
+	yarn
 
 # As with conda->mamba, uv is compatible with pip but much faster.  It
 # matters less here, of course, because there are many fewer
