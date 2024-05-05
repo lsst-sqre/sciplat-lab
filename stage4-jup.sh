@@ -1,12 +1,18 @@
 #!/bin/sh
 set -e
+
+_disable_ext () {
+    jupyter labextension disable $1
+    jupyter labextension lock $1  # Lock is new in jl 4.1
+}
+
 source ${LOADRSPSTACK}
 # File sharing doesn't work in the RSP environment; remove the extension.
-jupyter labextension disable "@jupyterlab/filebrowser-extension:share-file"
+_disable_ext "@jupyterlab/filebrowser-extension:share-file"
 # And Jupyter News is just obnoxious
-jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
+_disable_ext "@jupyterlab/apputils-extension:announcements"
 # Our RSP menu supersedes the Hub menu items
-jupyter labextension disable "@jupyterlab/hub-extension:menu"
+_disable_ext "@jupyterlab/hub-extension:menu"
 
 # List installed labextensions and put them into a format we could consume
 #  for installation

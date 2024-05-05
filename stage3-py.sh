@@ -24,7 +24,12 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
                     | jq -r '.[0].version')
 # Do the rest of the installation.
 mamba install --no-banner -y \
-     "rubin-env-rsp==${rubin_env_ver}"
+      "rubin-env-rsp==${rubin_env_ver}"
+
+# qtpdf?
+mamba uninstall --no-banner -y nbconvert-webpdf
+
+mamba install --no-banner -y nbconvert-qtpdf
 
 # As with conda->mamba, uv is compatible with pip but much faster.  It
 # matters less here, of course, because there are many fewer
