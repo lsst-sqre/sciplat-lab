@@ -31,8 +31,6 @@ mamba install --no-banner -y \
 # And it's even weirder than that...
 # sed -i -e 's/fcse/fc/' /opt/lsst/software/stack/conda/miniconda3-py38_4.9.2/envs/lsst-scipipe-8.0.0/lib/python3.11/site-packages/firefly_client/firefly_client.py
 
-mamba uninstall --no-banner -y firefly-client
-
 # As with conda->mamba, uv is compatible with pip but much faster.  It
 # matters less here, of course, because there are many fewer
 # pip-installed packages.
