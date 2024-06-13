@@ -26,10 +26,9 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 mamba install --no-banner -y \
      "rubin-env-rsp==${rubin_env_ver}"
 
-# Force this temporarily
-# mamba install --no-banner -y 'firefly-client>=3.0.0'
-# And it's even weirder than that...
-# sed -i -e 's/fcse/fc/' /opt/lsst/software/stack/conda/miniconda3-py38_4.9.2/envs/lsst-scipipe-8.0.0/lib/python3.11/site-packages/firefly_client/firefly_client.py
+# Force this temporarily, because we need a newer version than ships with
+# rubin-env 8.0.0
+mamba install --no-banner -y 'firefly-client>=3.0.1'
 
 # As with conda->mamba, uv is compatible with pip but much faster.  It
 # matters less here, of course, because there are many fewer
@@ -47,9 +46,7 @@ pip install uv
 # not already provided by something in the conda env.  In this case,
 # structlog and symbolicmode from lsst-rsp.
 
-# Pip version of firefly-client may not be broken.
 uv pip install --no-build-isolation \
-    'firefly-client>=3.0.1' \
     rsp-jupyter-extensions \
     'jupyter-firefly-extensions>=4.1.1' \
     'lsst-rsp>=0.5.1' \
