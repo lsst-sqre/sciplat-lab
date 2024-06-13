@@ -1,72 +1,146 @@
-FROM {{INPUT}}{{TAG}}
+FROM {{INPUT}} as base-image
 USER root
 SHELL ["/bin/bash", "-lc"]
-# If we don't have locales set correctly, the pip install pieces can fail.
-#  Maybe they should be ARGs, but this seems like a reasonable thing to
-#  put in the environment by default.
-ENV  LANG=en_US.UTF-8
-# Runtime scripts use ${LOADRSPSTACK} but we need the distinction
-#  in case you want to create a separate environment for the JupyterLab-
-#  specific pieces.
-ENV  LOADSTACK=/opt/lsst/software/stack/loadLSST.bash
-ENV  LOADRSPSTACK=/opt/lsst/software/rspstack/loadrspstack.bash
-RUN  mkdir -p /opt/lsst/software/rspstack
-# If you want the JupyterLab pieces in their own environment, do the
-#  COPY and add the environment clone to the python build stage.  This
-#  increases container size by about 60%.  If you want it in the same
-#  environment (the default), link the RSP loadstack instead.
-#COPY loadrspstack.bash ${LOADRSPSTACK}
-# In general: if an environment variable needs to be used across multiple
-#  stages, make it an ARG.  Introduce it before the first stage that uses it.
-RUN  ln -s ${LOADSTACK} ${LOADRSPSTACK}
-ARG  srcdir=/opt/lsst/src
-ARG  BLD=${srcdir}/build
-ARG  jl=/opt/lsst/software/jupyterlab
-ARG  verdir="${jl}/versions.installed"
-RUN  mkdir -p ${BLD} ${verdir}
-COPY stage1-rpm.sh ${BLD}
-RUN  ${BLD}/stage1-rpm.sh
-COPY stage2-os.sh ${BLD}
-RUN  ${BLD}/stage2-os.sh
-COPY stage3-py.sh ${BLD}
-RUN  ${BLD}/stage3-py.sh
-# This should be exposed at runtime for JupyterLab, hence ENV
-ENV  NODE_OPTIONS="--max-old-space-size=7168 --max-http-header-size=16384"
-RUN  mkdir -p /usr/local/etc/jupyter
-# We update the config during stage 4.
-COPY jupyter_server_config.json jupyter_server_config.py \
-      /usr/local/etc/jupyter/
-COPY stage4-jup.sh ${BLD}
-RUN  ${BLD}/stage4-jup.sh
-COPY local01-nbstripjq.sh local02-hub.sh local03-showrspnotice.sh  \
-     local04-pythonrc.sh local05-path.sh local06-term.sh \
-     local07-namespaceenv.sh \
+
+RUN mkdir -p /tmp/build
+WORKDIR /tmp/build
+
+COPY scripts/install-base-packages /tmp/build
+RUN ./install-base-packages
+
+# Now we have a patched python container.  Add system dependencies.
+
+FROM base-image as deps-image
+COPY scripts/install-dependency-packages /tmp/build
+RUN ./install-dependency-packages
+
+# Add other system-level files
+
+# /etc/profile.d parts
+
+RUN mkdir -p /etc/profile.d
+
+COPY profile.d/local01-nbstripjq.sh profile.d/local02-hub.sh \
+     profile.d/local03-showrspnotice.sh profile.d/local04-pythonrc.sh \
+     profile.d/local05-path.sh profile.d/local06-term.sh \
+     profile.d/local07-namespaceenv.sh profile.d/local08-setupstack.sh \
      /etc/profile.d/
-COPY lsst_kernel.json \
+
+# /etc/skel
+
+RUN for i in notebooks WORK DATA; do mkdir -p /etc/skel/${i}; done
+
+COPY skel/pythonrc /etc/skel/.pythonrc
+COPY skel/gitconfig /etc/skel/.gitconfig
+COPY skel/git-credentials /etc/skel/.git-credentials
+COPY skel/user_setups /etc/skel/notebooks/.user_setups
+
+# Might want to move these?  Or make them owned by jupyter user?
+# But for right now they need to live here as a compatibility layer if
+# nothing else.
+
+COPY jupyter_server/jupyter_server_config.json \
+     jupyter_server/jupyter_server_config.py \
+     /usr/local/etc/jupyter/
+
+COPY runtime/lsst_kernel.json \
        /usr/local/share/jupyter/kernels/lsst/kernel.json
-COPY rsp_notice /usr/local/etc
-COPY pythonrc /etc/skel/.pythonrc
-COPY gitconfig /etc/skel/.gitconfig
-COPY git-credentials /etc/skel/.git-credentials
-COPY user_setups /etc/skel/notebooks/.user_setups
-COPY lsst_kernel.json lsstlaunch.bash runlab.sh 20-logging.py \
-      ${jl}/
-# If running noninteractively, configuration configmap must be mounted at
-# /opt/lsst/software/jupyterlab/noninteractive/command/command.json
-# and env. var NONINTERACTIVE must be set
-COPY stage5-ro.sh ${BLD}
-RUN  ${BLD}/stage5-ro.sh
-# Overwrite Stack Container definitions with more-accurate-for-us ones
-ENV  DESCRIPTION="Rubin Science Platform Notebook Aspect"
-ENV  SUMMARY="Rubin Science Platform Notebook Aspect"
-WORKDIR /tmp
-# This needs to be numeric for k8s non-root contexts.  We will
-#  replace it with the actual UID in the JupyterHub spawner, but 1000:1000
-#  is the container underlying lsst user, here lsst_local (as explained in
-#  stage5-ro.sh).  So just in case it's spawned by someone outside a JL
-#  context, and they manage to get all the setup env right, still not root.
+
+COPY etc/rsp_notice /usr/local/etc
+
+COPY scripts/install-system-files /tmp/build
+RUN ./install-system-files
+
+# Add our new unprivileged user.
+
+FROM deps-image as user-image
+
+COPY scripts/make-user /tmp/build
+RUN ./make-user
+
+# Give jupyterlab ownership to unprivileged user
+
+RUN mkdir -p /usr/local/share/jupyterlab
+RUN chown lsst_local:lsst_local /usr/local/share/jupyterlab
+
+# Switch to unprivileged user
+
+USER lsst_local:lsst_local
+
+# Add the DM stack.
+
+FROM user-image as base-stack-image
+
+COPY scripts/install-dm-stack /tmp/build
+RUN ./install-dm-stack {{TAG}}
+
+# Add RSP user-facing packages
+
+FROM base-stack-image as rsp-stack-image
+COPY scripts/install-rsp-user /tmp/build
+RUN ./install-rsp-user
+
+FROM rsp-stack-image as jupyterlab-image
+
+COPY scripts/install-jupyterlab /tmp/build
+RUN ./install-jupyterlab
+
+FROM jupyterlab-image as base-rsp-image
+
+RUN mkdir -p /usr/local/share/jupyterlab/etc
+COPY --chown=lsst_local:lsst_local etc/rsp_notice etc/20-logging.py \
+     jupyter_server/jupyter_server_config.json \
+     jupyter_server/jupyter_server_config.py \
+     /usr/local/share/jupyterlab/etc/
+
+COPY --chown=lsst_local:lsst_local runtime/lsst_kernel.json \
+     runtime/lsstlaunch.bash runtime/runlab /usr/local/share/jupyterlab/
+
+FROM base-rsp-image as notebooks-rsp-image
+
+# Check out notebooks-at-build-time
+COPY scripts/install-notebooks /tmp/build
+RUN ./install-notebooks
+
+FROM notebooks-rsp-image as compat-rsp-image
+
+# Add compatibility layer to allow for transition from old to new
+# paths.
+
+COPY scripts/install-compat /tmp/build
+RUN ./install-compat
+
+FROM compat-rsp-image as manifests-rsp-image
+
+# Get our manifests.  This has always been really useful for debugging
+# "what broke this week?"
+
+COPY scripts/generate-versions /tmp/build
+RUN ./generate-versions
+
+FROM manifests-rsp-image as rsp-image
+
+
+# Clean up.
+# This needs to be numeric, since we will remove /etc/passwd and friends
+# while we're running.
+USER 0:0
+WORKDIR /
+
+COPY scripts/cleanup-files /
+RUN ./cleanup-files
+RUN rm ./cleanup-files
+
+# Back to unprivileged
 USER 1000:1000
-CMD [ "/opt/lsst/software/jupyterlab/runlab.sh" ]
+WORKDIR /tmp
+
+CMD ["/usr/local/share/jupyterlab/runlab"]
+
+# Overwrite Stack Container definitions with more-accurate-for-us ones
+ENV  DESCRIPTION="Two-Python Rubin Science Platform Notebook Aspect"
+ENV  SUMMARY="Two-Python Rubin Science Platform Notebook Aspect"
+
 LABEL description="Rubin Science Platform Notebook Aspect: {{IMAGE}}" \
        name="{{IMAGE}}" \
        version="{{VERSION}}"
