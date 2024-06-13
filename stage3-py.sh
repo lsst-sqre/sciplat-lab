@@ -26,6 +26,10 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 mamba install --no-banner -y \
      "rubin-env-rsp==${rubin_env_ver}"
 
+# Force this temporarily, because we need a newer version than ships with
+# rubin-env 8.0.0
+mamba install --no-banner -y 'firefly-client>=3.0.1'
+
 # As with conda->mamba, uv is compatible with pip but much faster.  It
 # matters less here, of course, because there are many fewer
 # pip-installed packages.
@@ -41,6 +45,7 @@ pip install uv
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # structlog and symbolicmode from lsst-rsp.
+
 uv pip install --no-build-isolation \
     rsp-jupyter-extensions \
     'jupyter-firefly-extensions>=4.1.1' \
