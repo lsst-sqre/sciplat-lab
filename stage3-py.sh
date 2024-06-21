@@ -26,10 +26,6 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 mamba install --no-banner -y \
      "rubin-env-rsp==${rubin_env_ver}"
 
-# Trying to find a version of firefly-client + extensions that works.
-# The answer appears to be firefly-client 2.9 and extensions 4.1.1.
-mamba install --no-banner -y 'firefly-client<3'
-
 # As with conda->mamba, uv is compatible with pip but much faster.  It
 # matters less here, of course, because there are many fewer
 # pip-installed packages.
@@ -48,7 +44,7 @@ pip install uv
 
 uv pip install --no-build-isolation \
     rsp-jupyter-extensions \
-    'jupyter-firefly-extensions>=4.1.1,<4.2' \
+    jupyter-firefly-extensions \
     'lsst-rsp>=0.5.1' \
     structlog \
     'symbolicmode<3'
