@@ -26,6 +26,9 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 mamba install --no-banner -y \
      "rubin-env-rsp==${rubin_env_ver}"
 
+# Force newer firefly.  Unnecessary when rubin-env >= 9.0.0 appears.
+mamba install --no-banner -y 'firefly-client>=3'
+
 # As with conda->mamba, uv is compatible with pip but much faster.  It
 # matters less here, of course, because there are many fewer
 # pip-installed packages.
