@@ -1,4 +1,8 @@
 #!/bin/sh
+# Centos mirrors are dead.
+sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo
+sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo
+
 # This will be an interactive system, so we do want man pages after all
 # And we have non-US users, so we do not want to force only en_US.utf-8
 sed -i -e '/tsflags\=nodocs/d' \
