@@ -33,7 +33,8 @@ pip install uv
 uv pip install --no-build-isolation \
     'lsst-rsp>=0.5.1' \
     structlog \
-    'symbolicmode<3'
+    'symbolicmode<3' \
+    'jupyter_firefly_extensions'
 
 # Clean caches
 mamba clean -a -y --no-banner
