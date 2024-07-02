@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Check out notebooks-at-build-time
+# Do a shallow clone (important for the tutorials)
+nbdir="/opt/lsst/software/notebooks-at-build-time"
+mkdir -p "${nbdir}"
+branch="prod"
+notebooks="lsst-sqre/system-test rubin-dp0/tutorial-notebooks"
+cd ${nbdir}
+for n in ${notebooks}; do
+    git clone --depth 1 -b ${branch} "https://github.com/${n}"
+done

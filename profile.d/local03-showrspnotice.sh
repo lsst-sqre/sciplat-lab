@@ -1,5 +1,7 @@
 #!/bin/sh
 
+etc="/usr/local/share/jupyterlab/etc"
+
 site_recommendation () {
     cat << EOF
 
@@ -26,11 +28,11 @@ case "$-" in
         #  Are we a login shell?
         if shopt -q login_shell; then
             # Yes.  Display the notice(s)
-            if [ -e "/usr/local/etc/rsp_notice" ]; then
-                cat /usr/local/etc/rsp_notice
+            if [ -e "${etc}/rsp_notice" ]; then
+                cat ${etc}/rsp_notice
                 site_recommendation
             fi
-            msgdir="/opt/lsst/software/jupyterlab/messages.d"
+            msgdir="${etc}/messages.d"
             if [ -e  ${msgdir} ]; then
                 any=$(ls ${msgdir})
                 if [ -n "${any}" ]; then

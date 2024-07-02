@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+for f in passwd group shadow gshadow subuid subgid; do
+    rm /etc/${f} /etc/${f}-
+done
+
+rm -rf /tmp/* /tmp/.*  # Modern Unixes don't recursively remove ".."
+
