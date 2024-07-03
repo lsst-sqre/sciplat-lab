@@ -22,6 +22,7 @@ python3 -m uv pip install --upgrade \
    bokeh \
    bqplot \
    datashader \
+   firefly-client \
    geoviews \
    holoviews \
    ipydatawidgets \
@@ -32,8 +33,8 @@ python3 -m uv pip install --upgrade \
    ipywidgets \
    jupyter \
    jupyter_bokeh \
+   jupyter_firefly_extensions \
    jupyter-dash \
-   jupyter-firefly-extensions \
    jupyter-resource-usage \
    jupyter-server-proxy \
    jupyterhub \
