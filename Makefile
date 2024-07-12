@@ -51,7 +51,7 @@ ifeq ($(image),)
 endif
 
 ifeq ($(input),)
-    input = docker.io/lsstsqre/centos:7-stack-lsst_distrib-
+    input = docker.io/library/python:3.12
     # For one of the four build targets, you need to include the colon here,
     # and the input tag has to end with $(tag).  For "retag" it's different
     # and is explained below.
@@ -86,15 +86,6 @@ ifneq ($(branch),$(release_branch))
 endif
 ifneq ($(supplementary),)
     version := exp_$(version)_$(supplementary)
-endif
-
-# We don't have an arm64 build of the DM stack yet, so if you happen to be
-#  building on such a machine (e.g. Apple Silicon), cross-build to amd64
-#  instead
-
-uname := $(shell uname -p)
-ifeq ($(uname),arm)
-    platform := --platform amd64
 endif
 
 # Experimentals do not get tagged as latest anything.  Dailies, weeklies, and
@@ -159,11 +150,10 @@ push: image
 # I keep getting this wrong, so make it work either way.
 build: image
 
-# Force DOCKER_BUILDKIT off, to appease GitHub Actions (6 Aug 2023)
 image: dockerfile
 	img=$$(echo $(image) | cut -d ',' -f 1) && \
 	more=$$(echo $(image) | cut -d ',' -f 2- | tr ',' ' ') && \
-	DOCKER_BUILDKIT=0 $(DOCKER) build ${platform} -t $${img}:$(version) . && \
+	$(DOCKER) build ${platform} -t $${img}:$(version) . && \
 	for m in $${more}; do \
 	    $(DOCKER) tag $${img}:$(version) $${m}:$(version) ; \
 	done
