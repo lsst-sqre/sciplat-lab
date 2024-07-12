@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -x
+set -euo pipefail
+
+cd /
+
+export DEBIAN_FRONTEND=noninteractive
+# Stuff we need for OpenSplice
+# OpenJDK 8 is no longer available with bookworm.  Here's a workaround.
+curl http://www.mirbsd.org/~tg/Debs/sources.txt/wtflts-bookworm.sources \
+     -o /etc/apt/sources.list.d/wtflst-bookworm.sources
+apt update
+apt install -y cpio dos2unix iproute2 iptables libmnl0 libnfnetlink0 \
+    libnetfilter-conntrack3 openjdk-8-jdk rpm2cpio
+
+cd /
+
+# Our base container isn't RPM-based, but since the OpenSpliceDDS rpm is
+# very simple, it doesn't matter.  We can unpack it with rpm2cpio
+
+# rpm2cpio only deals with a single file, so that star better expand for
+# only one target
+rpm2cpio /tmp/build/OpenSpliceDDS*rpm | cpio -id 
+
+# The el8 RPM unpacks this for you already, and that's the only postinstall
+# script in the el7 RPM.
+
+py_dir="/opt/OpenSpliceDDS/V6.9.0/HDE/x86_64.linux/tools/python"
+if [ -f "${py_dir}/python-support.tgz" ]; then
+    cd "$py_dir"
+    tar xvfz python-support.tgz
+fi
+
+# This isn't really OpenSplice but does need to be done as root, so...
+
+cd /usr/share/zoneinfo
+curl https://www.ietf.org/timezones/data/leap-seconds.list -o leap-seconds.list
+

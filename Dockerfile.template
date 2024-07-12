@@ -63,29 +63,52 @@ RUN ./make-user
 RUN mkdir -p /usr/local/share/jupyterlab
 RUN chown lsst_local:lsst_local /usr/local/share/jupyterlab
 
+FROM user-image as sal-image
+
+# Set up T&S Cycle info
+# cf https://github.com/lsst-ts/ts_cycle_build/blob/main/cycle/cycle.env
+COPY sal/cycle.env /tmp/build
+
+# Set up SAL environment
+RUN mkdir -p /opt/lsst/src /opt/lsst/sal
+COPY sal/salbldsteps.bash /opt/lsst/sal/salbldsteps.bash
+RUN chown -R lsst_local:lsst_local /opt/lsst/src /opt/lsst/sal
+
+# Do OpenSplice installation
+COPY scripts/install-opensplice /tmp/build
+# Please only put one OpenSpliceDDS RPM here.
+COPY sal/opensplice/OpenSpliceDDS-*.rpm /tmp/build/
+RUN /tmp/build/install-opensplice
+
 # Switch to unprivileged user
 
 USER lsst_local:lsst_local
 
 # Add the DM stack.
 
-FROM user-image as base-stack-image
-
+FROM sal-image as dm-stack-image
 COPY scripts/install-dm-stack /tmp/build
 RUN ./install-dm-stack {{TAG}}
 
+# Add SAL packages
+
+FROM dm-stack-image as sal-stack-image
+COPY scripts/install-sal /tmp/build
+RUN ./install-sal
+
 # Add RSP user-facing packages
 
-FROM base-stack-image as rsp-stack-image
+FROM sal-stack-image as rsp-stack-image
 COPY scripts/install-rsp-user /tmp/build
 RUN ./install-rsp-user
 
-FROM rsp-stack-image as jupyterlab-image
+# Install the JupyterLab machinery
 
+FROM sal-stack-image as jupyterlab-image
 COPY scripts/install-jupyterlab /tmp/build
 RUN ./install-jupyterlab
 
-FROM jupyterlab-image as base-rsp-image
+FROM jupyterlab-image as base-phalanx-image
 
 RUN mkdir -p /usr/local/share/jupyterlab/etc
 COPY --chown=lsst_local:lsst_local etc/rsp_notice etc/20-logging.py \
@@ -96,13 +119,13 @@ COPY --chown=lsst_local:lsst_local etc/rsp_notice etc/20-logging.py \
 COPY --chown=lsst_local:lsst_local runtime/lsst_kernel.json \
      runtime/lsstlaunch.bash runtime/runlab /usr/local/share/jupyterlab/
 
-FROM base-rsp-image as notebooks-rsp-image
+FROM base-phalanx-image as notebooks-phalanx-image
 
 # Check out notebooks-at-build-time
 COPY scripts/install-notebooks /tmp/build
 RUN ./install-notebooks
 
-FROM notebooks-rsp-image as compat-rsp-image
+FROM notebooks-phalanx-image as compat-phalanx-image
 
 # Add compatibility layer to allow for transition from old to new
 # paths.
@@ -110,7 +133,7 @@ FROM notebooks-rsp-image as compat-rsp-image
 COPY scripts/install-compat /tmp/build
 RUN ./install-compat
 
-FROM compat-rsp-image as manifests-rsp-image
+FROM compat-phalanx-image as manifests-phalanx-image
 
 # Get our manifests.  This has always been really useful for debugging
 # "what broke this week?"
@@ -118,7 +141,7 @@ FROM compat-rsp-image as manifests-rsp-image
 COPY scripts/generate-versions /tmp/build
 RUN ./generate-versions
 
-FROM manifests-rsp-image as rsp-image
+FROM manifests-phalanx-image as phalanx-image
 
 
 # Clean up.
@@ -138,9 +161,9 @@ WORKDIR /tmp
 CMD ["/usr/local/share/jupyterlab/runlab"]
 
 # Overwrite Stack Container definitions with more-accurate-for-us ones
-ENV  DESCRIPTION="Two-Python Rubin Science Platform Notebook Aspect"
-ENV  SUMMARY="Two-Python Rubin Science Platform Notebook Aspect"
+ENV  DESCRIPTION="Two-Python Rubin T&S Notebook Aspect"
+ENV  SUMMARY="Two-Python Rubin T&S Notebook Aspect"
 
-LABEL description="Rubin Science Platform Notebook Aspect: {{IMAGE}}" \
+LABEL description="Rubin T&S Notebook Aspect: {{IMAGE}}" \
        name="{{IMAGE}}" \
        version="{{VERSION}}"

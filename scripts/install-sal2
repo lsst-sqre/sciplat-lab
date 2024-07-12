@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -x
+set -eo pipefail
+
+# Set T&S cycle parms
+. /tmp/build/cycle.env
+
+LOADSTACK=/opt/lsst/software/stack/loadLSST.bash
+SRCDIR=/opt/lsst/src
+SALSTACK=/opt/lsst/sal/salbldsteps.bash
+TZ="UTC"
+OSPL_HOME=/opt/OpenSpliceDDS/V${osplice_v}/HDE/x86_64.linux
+
+. ${LOADSTACK}
+
+source ${LOADSTACK}
+unset LD_PRELOAD
+setup lsst_distrib
+
+source ${OSPL_HOME}/release.com
+
+export OSPL_URI=$(python -c "from lsst.ts import ddsconfig; print( (ddsconfig.get_config_dir() / 'ospl-shmem.xml').as_uri())")
+
+
+ddsconfig_path=$(python -c 'from lsst.ts import ddsconfig; import pathlib; print(pathlib.Path(ddsconfig.__file__).parents[0])')
+eups declare -m none -r ${ddsconfig_path} ts_ddsconfig ${ts_ddsconfig}
+utils_path=$(python -c 'from lsst.ts import utils; import pathlib; print(pathlib.Path(utils.__file__).parents[0])')
+eups declare -m none -r ${utils_path} ts_utils ${ts_utils}
+salobj_path=$(python -c 'from lsst.ts import salobj; import pathlib; print(pathlib.Path(salobj.__file__).parents[0])')
+eups declare -m none -r ${salobj_path} ts_salobj ${ts_salobj}
+idl_path=$(python -c 'from lsst.ts import idl; import pathlib; print(pathlib.Path(idl.__file__).parents[0])')
+eups declare -m none -r ${idl_path} ts_idl ${ts_idl}_${ts_xml}_${ts_sal}
+atdome_path=$(python -c 'from lsst.ts import atdome; import pathlib; print(pathlib.Path(atdome.__file__).parents[0])')
+eups declare -m none -r ${atdome_path} ts_atdome ${ts_atdome}
+atdometrajectory_path=$(python -c 'from lsst.ts import atdometrajectory; import pathlib; print(pathlib.Path(atdometrajectory.__file__).parents[0])')
+eups declare -m none -r ${atdometrajectory_path} ts_atdometrajectory ${ts_atdometrajectory}
+criopy_path=$(python -c 'from lsst.ts import criopy; import pathlib; print(pathlib.Path(criopy.__file__).parents[0])')
+eups declare -m none -r ${criopy_path} ts_criopy ${ts_criopy} && \
+atmcssimulator_path=$(python -c 'from lsst.ts import atmcssimulator; import pathlib; print(pathlib.Path(atmcssimulator.__file__).parents[0])')
+eups declare -m none -r ${atmcssimulator_path} ts_atmcssimulator ${ts_atmcssimulator}
+
+# Only clone and setup the packages that are really necessary to be managed
+# with eups. Everything else is installed using conda.
+cd ${SRCDIR}
+gitsrc="ts_config_ocs:${ts_config_ocs} \
+    ts_config_attcs:${ts_config_attcs} \
+    ts_config_mtcalsys:${ts_config_mtcalsys} \
+    ts_config_eas:${ts_config_eas} \
+    ts_config_latiss:${ts_config_latiss} \
+    ts_config_mttcs:${ts_config_mttcs} \
+    ts_config_atcalsys:${ts_config_atcalsys} \
+    ts_observatory_control:${ts_observatory_control} \
+    ts_standardscripts:${ts_standardscripts} \
+    ts_externalscripts:${ts_externalscripts}"
+
+rb="https://github.com/lsst-ts"
+
+for g in $gitsrc ; do
+    r=$(echo ${g} | cut -d ':' -f 1)
+    t=$(echo ${g} | cut -d ':' -f 2)
+    retag=${t//a/"-alpha."}
+    retag=${retag//b/"-beta."}
+    retag=${retag//rc/"-rc."}
+    git clone --branch v${retag} --depth 1 --single-branch ${rb}/${r}.git
+    cd ${r}
+    git checkout -b ${t}
+    eups declare -r . -t current ${r} ${t}
+    cd ..
+done
+
+. ${SALSTACK}
+
+# Check that packages can be imported.
+python -c "from lsst.ts.observatory import control"
+python -c "from lsst.ts import standardscripts"
+python -c "from lsst.ts import externalscripts"
