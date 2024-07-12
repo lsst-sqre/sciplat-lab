@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -x
+set -euo pipefail
 
 for f in passwd group shadow gshadow subuid subgid; do
     rm /etc/${f} /etc/${f}-

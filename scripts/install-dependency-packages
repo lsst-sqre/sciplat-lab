@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -x
 
 # This script installs additional packages used by the dependency image but
 # not needed by the runtime image, such as additional packages required to

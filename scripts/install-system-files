@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -x
+set -euo pipefail
 
 # This is for Fritz, and my nefarious plan to make the "te" in "Jupyter" TECO.
 # We switched from TECOC to Paul Koning's Python implementation because it

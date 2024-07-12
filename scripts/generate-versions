@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -x
 
 set -eo pipefail  # -u and mamba don't play well: ADDR2LINE: unbound variable
 

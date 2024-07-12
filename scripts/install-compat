@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -x
 #
 # This can be pretty minimal.  Effectively we just want to ensure that
 # files once found in the old-style layout still exist, but point to their
