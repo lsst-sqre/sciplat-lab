@@ -5,7 +5,6 @@ SHELL ["/bin/bash", "-lc"]
 #  Maybe they should be ARGs, but this seems like a reasonable thing to
 #  put in the environment by default.
 ENV  LANG=en_US.UTF-8
-ENV  LC_ALL=en_US.UTF-8
 # Runtime scripts use ${LOADRSPSTACK} but we need the distinction
 #  in case you want to create a separate environment for the JupyterLab-
 #  specific pieces.
