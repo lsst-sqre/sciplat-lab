@@ -51,7 +51,7 @@ ifeq ($(image),)
 endif
 
 ifeq ($(input),)
-    input = docker.io/library/python:3.12
+    input = docker.io/library/python:3.12-slim
     # For one of the four build targets, you need to include the colon here,
     # and the input tag has to end with $(tag).  For "retag" it's different
     # and is explained below.
