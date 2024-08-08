@@ -30,3 +30,5 @@ find ${stackdir} -maxdepth 5 -name src -type d -exec rm -rf {} + \
 eups distrib install -t $TAG lsst_distrib
 curl -sSL $sbt | python
 setup lsst_distrib
+
+mamba clean -a -f -y --no-banner # Not clear that -f is safe.

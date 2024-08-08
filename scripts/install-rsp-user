@@ -38,5 +38,5 @@ uv pip install --no-build-isolation \
     'jupyter_firefly_extensions'
 
 # Clean caches
-mamba clean -a -y --no-banner
+mamba clean -a -y -f --no-banner
 uv cache clean
