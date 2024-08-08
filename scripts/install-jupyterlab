@@ -50,11 +50,16 @@ python3 -m uv pip install --upgrade \
    nbdime \
    nbval \
    panel \
+   playwright \
    plotly \
    pythreejs \
    pre-commit \
    rsp-jupyter-extensions \
+   ruff \
    sidecar
+
+# Having done that, install chromium (for webpdf export)
+playwright install chromium
 
 # File sharing doesn't work in the RSP environment; remove the extension.
 jupyter labextension disable "@jupyterlab/filebrowser-extension:share-file"
