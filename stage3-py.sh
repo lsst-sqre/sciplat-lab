@@ -28,6 +28,9 @@ mamba install --no-banner -y \
 
 # Force newer firefly.  Unnecessary when rubin-env >= 9.0.0 appears.
 mamba install --no-banner -y 'firefly-client>=3'
+# Troubleshooting holoviews rasterize() bug
+mamba uninstall --force -y holoviews
+mamba install --force --no-deps -y 'holoviews=1.18.1'
 
 # As with conda->mamba, uv is compatible with pip but much faster.  It
 # matters less here, of course, because there are many fewer
