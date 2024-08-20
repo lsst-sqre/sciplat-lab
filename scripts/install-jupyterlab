@@ -13,6 +13,11 @@ source /usr/local/share/jupyterlab/venv/bin/activate
 
 python3 -m pip install uv
 
+# We need to install datashader and its dependencies first, because otherwise
+# we get stuck in a nasty llvm version dependency hole.
+
+python3 -m uv pip install --upgrade datashader
+
 # Here we go.  Most of these are Jupyter-related.  Some (like black and mypy)
 # are just a good idea.
 
@@ -22,7 +27,6 @@ python3 -m uv pip install --upgrade \
    black-nb \
    bokeh \
    bqplot \
-   datashader \
    firefly-client \
    geoviews \
    holoviews \
@@ -44,6 +48,7 @@ python3 -m uv pip install --upgrade \
    jupyterlab_iframe \
    jupyterlab_widgets \
    lckr-jupyterlab-variableinspector \
+   llvmlite \
    lsst-rsp \
    mypy \
    'nbconvert[webpdf]' \
