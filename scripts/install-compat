@@ -22,6 +22,6 @@ done
 ln -s "${realdir}/etc/20-logging.py"
 ln -s "${realdir}/runlab" runlab.sh
 
-cd ${realdir}
+cd ${realdir}/venv/bin
 rm jupyter-labhub
 ln -s jupyter-lab jupyter-labhub
