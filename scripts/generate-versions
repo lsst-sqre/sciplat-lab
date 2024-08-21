@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -x
 
-set -eo pipefail  # -u and mamba don't play well: ADDR2LINE: unbound variable
+set -euo pipefail
 
 # First system
 
@@ -18,10 +18,4 @@ python -m uv pip list > "jupyterlab-python"
 (jupyter labextension list 2>&1) > "lab-extensions"
 deactivate
 
-# Now the stack
-vi_dir="/opt/lsst/software/jupyterlab/versions-installed"
-source /opt/lsst/software/stack/loadLSST.bash
-mkdir -p ${vi_dir}
-cd ${vi_dir}
-mamba env export > conda-stack.yaml
 

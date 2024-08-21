@@ -67,20 +67,7 @@ RUN chown lsst_local:lsst_local /usr/local/share/jupyterlab
 
 USER lsst_local:lsst_local
 
-# Add the DM stack.
-
-FROM user-image as base-stack-image
-
-COPY scripts/install-dm-stack /tmp/build
-RUN ./install-dm-stack {{TAG}}
-
-# Add RSP user-facing packages
-
-FROM base-stack-image as rsp-stack-image
-COPY scripts/install-rsp-user /tmp/build
-RUN ./install-rsp-user
-
-FROM rsp-stack-image as jupyterlab-image
+FROM user-image as jupyterlab-image
 
 COPY scripts/install-jupyterlab /tmp/build
 RUN ./install-jupyterlab
