@@ -21,7 +21,3 @@ for file in lsst_kernel.json lsstlaunch.bash; do
 done
 ln -s "${realdir}/etc/20-logging.py"
 ln -s "${realdir}/runlab" runlab.sh
-
-cd ${realdir}/venv/bin
-rm jupyter-labhub
-ln -s jupyter-lab jupyter-labhub

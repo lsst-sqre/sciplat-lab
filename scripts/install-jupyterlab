@@ -49,7 +49,7 @@ python3 -m uv pip install --upgrade \
    jupyterlab_widgets \
    lckr-jupyterlab-variableinspector \
    llvmlite \
-   lsst-rsp \
+   'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-45854' \
    mypy \
    'nbconvert[webpdf]' \
    nbdime \
