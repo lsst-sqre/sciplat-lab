@@ -21,6 +21,9 @@ python3 -m uv pip install --upgrade datashader
 # Here we go.  Most of these are Jupyter-related.  Some (like black and mypy)
 # are just a good idea.
 
+# jupyter_server needs to be installed from git until a release that includes
+# pull #1447 is cut.
+
 python3 -m uv pip install --upgrade \
    astrowidgets \
    black \
@@ -41,6 +44,7 @@ python3 -m uv pip install --upgrade \
    jupyter_firefly_extensions \
    jupyter-dash \
    jupyter-resource-usage \
+   'git+https://github.com/jupyter-server/jupyter_server' \
    jupyter-server-proxy \
    jupyterhub \
    jupyterlab \
@@ -71,7 +75,7 @@ jupyter labextension disable "@jupyterlab/filebrowser-extension:share-file"
 # And Jupyter News is just obnoxious
 jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
 # Our RSP menu supersedes the Hub menu items
-jupyter labextension disable "@jupyterlab/hub-extension:menu"
+# jupyter labextension disable "@jupyterlab/hub-extension:menu"
 
 jupyter labextension lock "@jupyterlab/hub-extension:menu" \
 	"@jupyterlab/apputils-extension:announcements" \
