@@ -25,24 +25,6 @@ python3 -m uv pip install --upgrade datashader
 # pull #1447 is cut.
 
 
-#   ipydatawidgets \
-#   ipympl \
-#   ipyvolume \
-#   ipyvuetify \
-#   ipywebrtc \
-#   ipywidgets \
-#   jupyter-dash \
-#   jupyter-resource-usage \
-#   panel \
-#   jupyterlab_execute_time \
-#   jupyterlab_iframe \
-#   jupyterlab_widgets \
-#   lckr-jupyterlab-variableinspector \
-#   astrowidgets \
-#   black \
-#   black-nb \
-#   geoviews \
-#   pythreejs \
 #   jupyter_firefly_extensions \
 
 
@@ -68,7 +50,25 @@ python3 -m uv pip install --upgrade \
    pre-commit \
    rsp-jupyter-extensions \
    ruff \
-   sidecar
+   sidecar \
+   ipydatawidgets \
+   ipympl \
+   ipyvolume \
+   ipyvuetify \
+   ipywebrtc \
+   ipywidgets \
+   jupyter-dash \
+   jupyter-resource-usage \
+   panel \
+   jupyterlab_execute_time \
+   jupyterlab_iframe \
+   jupyterlab_widgets \
+   lckr-jupyterlab-variableinspector \
+   astrowidgets \
+   black \
+   black-nb \
+   geoviews \
+   pythreejs
 
 # Having done that, install chromium (for webpdf export)
 playwright install chromium
