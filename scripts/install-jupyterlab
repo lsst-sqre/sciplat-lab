@@ -38,16 +38,17 @@ python3 -m uv pip install --upgrade datashader
 #   jupyterlab_iframe \
 #   jupyterlab_widgets \
 #   lckr-jupyterlab-variableinspector \
+#   astrowidgets \
+#   black \
+#   black-nb \
+#   geoviews \
+#   pythreejs \
 
 
 python3 -m uv pip install --upgrade \
-   astrowidgets \
-   black \
-   black-nb \
    bokeh \
    bqplot \
    firefly-client \
-   geoviews \
    holoviews \
    jupyter \
    jupyter_bokeh \
@@ -64,7 +65,6 @@ python3 -m uv pip install --upgrade \
    nbval \
    playwright \
    plotly \
-   pythreejs \
    pre-commit \
    rsp-jupyter-extensions \
    ruff \
