@@ -34,6 +34,10 @@ python3 -m uv pip install --upgrade datashader
 #   jupyter-dash \
 #   jupyter-resource-usage \
 #   panel \
+#   jupyterlab_execute_time \
+#   jupyterlab_iframe \
+#   jupyterlab_widgets \
+#   lckr-jupyterlab-variableinspector \
 
 
 python3 -m uv pip install --upgrade \
@@ -52,10 +56,6 @@ python3 -m uv pip install --upgrade \
    jupyter-server-proxy \
    jupyterhub \
    jupyterlab \
-   jupyterlab_execute_time \
-   jupyterlab_iframe \
-   jupyterlab_widgets \
-   lckr-jupyterlab-variableinspector \
    llvmlite \
    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-45854' \
    mypy \
