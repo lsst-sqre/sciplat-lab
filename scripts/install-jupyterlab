@@ -43,6 +43,7 @@ python3 -m uv pip install --upgrade datashader
 #   black-nb \
 #   geoviews \
 #   pythreejs \
+#   jupyter_firefly_extensions \
 
 
 python3 -m uv pip install --upgrade \
@@ -52,7 +53,6 @@ python3 -m uv pip install --upgrade \
    holoviews \
    jupyter \
    jupyter_bokeh \
-   jupyter_firefly_extensions \
    'git+https://github.com/jupyter-server/jupyter_server' \
    jupyter-server-proxy \
    jupyterhub \
