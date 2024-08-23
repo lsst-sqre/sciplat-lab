@@ -24,6 +24,18 @@ python3 -m uv pip install --upgrade datashader
 # jupyter_server needs to be installed from git until a release that includes
 # pull #1447 is cut.
 
+
+#   ipydatawidgets \
+#   ipympl \
+#   ipyvolume \
+#   ipyvuetify \
+#   ipywebrtc \
+#   ipywidgets \
+#   jupyter-dash \
+#   jupyter-resource-usage \
+#   panel \
+
+
 python3 -m uv pip install --upgrade \
    astrowidgets \
    black \
@@ -33,17 +45,9 @@ python3 -m uv pip install --upgrade \
    firefly-client \
    geoviews \
    holoviews \
-   ipydatawidgets \
-   ipympl \
-   ipyvolume \
-   ipyvuetify \
-   ipywebrtc \
-   ipywidgets \
    jupyter \
    jupyter_bokeh \
    jupyter_firefly_extensions \
-   jupyter-dash \
-   jupyter-resource-usage \
    'git+https://github.com/jupyter-server/jupyter_server' \
    jupyter-server-proxy \
    jupyterhub \
@@ -58,7 +62,6 @@ python3 -m uv pip install --upgrade \
    'nbconvert[webpdf]' \
    nbdime \
    nbval \
-   panel \
    playwright \
    plotly \
    pythreejs \
