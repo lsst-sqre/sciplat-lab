@@ -24,51 +24,49 @@ python3 -m uv pip install --upgrade datashader
 # jupyter_server needs to be installed from git until a release that includes
 # pull #1447 is cut.
 
-
-#   jupyter_firefly_extensions \
-
+# Our culprit is jupyter_firefly_extensions
 
 python3 -m uv pip install --upgrade \
+   astrowidgets \
+   black \
+   black-nb \
    bokeh \
    bqplot \
    firefly-client \
-   holoviews \
-   jupyter \
-   jupyter_bokeh \
+   geoviews \
    'git+https://github.com/jupyter-server/jupyter_server' \
-   jupyter-server-proxy \
-   jupyterhub \
-   jupyterlab \
-   llvmlite \
    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-45854' \
-   mypy \
-   'nbconvert[webpdf]' \
-   nbdime \
-   nbval \
-   playwright \
-   plotly \
-   pre-commit \
-   rsp-jupyter-extensions \
-   ruff \
-   sidecar \
+   holoviews \
    ipydatawidgets \
    ipympl \
    ipyvolume \
    ipyvuetify \
    ipywebrtc \
    ipywidgets \
+   jupyter \
    jupyter-dash \
    jupyter-resource-usage \
-   panel \
+   jupyter-server-proxy \
+   jupyter_bokeh \
+   jupyterhub \
+   jupyterlab \
    jupyterlab_execute_time \
    jupyterlab_iframe \
    jupyterlab_widgets \
    lckr-jupyterlab-variableinspector \
-   astrowidgets \
-   black \
-   black-nb \
-   geoviews \
+   llvmlite \
+   mypy \
+   'nbconvert[webpdf]' \
+   nbdime \
+   nbval \
+   panel \
+   playwright \
+   plotly \
+   pre-commit \
    pythreejs
+   rsp-jupyter-extensions \
+   ruff \
+   sidecar
 
 # Having done that, install chromium (for webpdf export)
 playwright install chromium
