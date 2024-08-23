@@ -24,8 +24,7 @@ python3 -m uv pip install --upgrade datashader
 # jupyter_server needs to be installed from git until a release that includes
 # pull #1447 is cut.
 
-# Our culprit is jupyter_firefly_extensions
-
+# jupyter_firefly_extensions is slightly incompatible with bokeh
 python3 -m uv pip install --upgrade \
    astrowidgets \
    black \
@@ -45,6 +44,7 @@ python3 -m uv pip install --upgrade \
    ipywidgets \
    jupyter \
    jupyter-dash \
+   jupyter_firefly_extensions \
    jupyter-resource-usage \
    jupyter-server-proxy \
    jupyter_bokeh \
@@ -63,7 +63,7 @@ python3 -m uv pip install --upgrade \
    playwright \
    plotly \
    pre-commit \
-   pythreejs
+   pythreejs \
    rsp-jupyter-extensions \
    ruff \
    sidecar
