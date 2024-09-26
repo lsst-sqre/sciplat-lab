@@ -22,8 +22,7 @@ on:
         default: 'true'
 
 # We need actions/write if we want to do a GH App, and we need
-# packages/write to push to ghcr.io with GITHUB_TOKEN (currently not
-# working, under investigation)
+# packages/write to push to ghcr.io with GITHUB_TOKEN
 permissions:
   actions: write
   contents: read
@@ -88,8 +87,8 @@ jobs:
                  ghcr.io | *.ghcr.io)
                      d_tag="github_"
                      d_registry="ghcr.io"
-                     d_username="token"
-                     d_password="${{ secrets.GHCR_PUSH_TOKEN}}"
+                     d_username="${{ github.actor }}"
+                     d_password="${{ secrets.GITHUB_TOKEN }}"
                      ;;
                  *-docker.pkg.dev)
                     d_tag="google_"
