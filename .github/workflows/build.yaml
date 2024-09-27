@@ -35,7 +35,7 @@ jobs:
     timeout-minutes: 100
     steps:
     - name: checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: import_inputs
       shell: bash
       run: |
@@ -87,8 +87,10 @@ jobs:
                  ghcr.io | *.ghcr.io)
                      d_tag="github_"
                      d_registry="ghcr.io"
-                     d_username="${{ github.actor }}"
-                     d_password="${{ secrets.GITHUB_TOKEN }}"
+                     # using secrets.GITHUB_TOKEN fails, saying it doesn't
+                     # have write.package, which seems weird.
+                     d_username="token"
+                     d_password="${{ secrets.GHCR_PUSH_TOKEN}}"
                      ;;
                  *-docker.pkg.dev)
                     d_tag="google_"
