@@ -4,3 +4,5 @@ if [ "${TERM}" == "xterm" ]; then
 fi
 export TERM
 
+eval $(dircolors -b /etc/dircolors.ansi-universal)
+alias ls="ls --color=auto"
