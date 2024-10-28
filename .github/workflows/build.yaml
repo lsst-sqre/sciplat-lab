@@ -35,7 +35,7 @@ jobs:
     timeout-minutes: 100
     steps:
     - name: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: import_inputs
       shell: bash
       run: |
@@ -118,7 +118,7 @@ jobs:
          (env.docker_registry != '') &&
          (env.docker_username != '') &&
          (env.docker_password != ''))
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: ${{ env.docker_registry }}
         username: ${{ env.docker_username }}
@@ -129,7 +129,7 @@ jobs:
          (env.github_registry != '') &&
          (env.github_username != '') &&
          (env.github_password != ''))
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: ${{ env.github_registry }}
         username: ${{ env.github_username }}
@@ -140,7 +140,7 @@ jobs:
          (env.google_registry != '') &&
          (env.google_username != '') &&
          (env.google_password != ''))
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: ${{ env.google_registry }}
         username: ${{ env.google_username }}
