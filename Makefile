@@ -63,8 +63,7 @@ endif
 # kicking off scheduled builds.
 
 ifeq ($(input),)
-    latest := $(shell git describe --tags --abbrev=0)
-    input = ghcr.io/lsst-sqre/nublado-jupyterlab-base:$(latest)
+    input = ghcr.io/lsst-sqre/nublado-jupyterlab-base
 endif
 
 # Some day we might use a different build tool.  If you have a new enough
