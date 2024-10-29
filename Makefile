@@ -51,19 +51,17 @@ ifeq ($(image),)
     image = docker.io/lsstsqre/sciplat-lab,us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab
 endif
 
-# Our default input image is ghcr.io/lsst-sqre/nublado-jupyterlab-base:latest
-# where latest is the last tag on the current branch (or its ancestors).
-# This might or might not be quite the right heuristic but it's pretty close.
+# Our default input image is ghcr.io/lsst-sqre/nublado-jupyterlab-base
 #
-# Note that this particular strategy is only going to work for builds happening
-# from the same repository as the base build, which probably means just
-# sciplat-lab.
+# Right now the tag has to be manually specified, but a little work on the
+# nublado side should at least get us to tag latest on tagged uploads from
+# main.
 #
 # You can always specify it directly, but this should be a sane default for
 # kicking off scheduled builds.
 
 ifeq ($(input),)
-    input = ghcr.io/lsst-sqre/nublado-jupyterlab-base
+    input = ghcr.io/lsst-sqre/nublado-jupyterlab-base:8.0.0
 endif
 
 # Some day we might use a different build tool.  If you have a new enough
