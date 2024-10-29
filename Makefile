@@ -165,7 +165,7 @@ image:
 	more=$$(echo $(image) | cut -d ',' -f 2- | tr ',' ' ') && \
 	$(DOCKER) build ${platform} --build-arg input=$(input) \
           --build-arg image=$${img} --build-arg tag=$(tag) \
-          -t $${img}:$(version) -f ../Dockerfile.sciplat-lab . && \
+          -t $${img}:$(version) . && \
 	for m in $${more}; do \
 	    $(DOCKER) tag $${img}:$(version) $${m}:$(version) ; \
 	done
