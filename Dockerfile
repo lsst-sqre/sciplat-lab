@@ -1,81 +1,79 @@
-FROM python:3.12.7-slim-bookworm AS base-image
-USER root
+ARG input
+FROM $input AS base-image
+USER 0:0
 SHELL ["/bin/bash", "-lc"]
 
 RUN mkdir -p /tmp/build
 WORKDIR /tmp/build
 
-COPY scripts/install-base-packages /tmp/build
-RUN ./install-base-packages
-
-# Now we have a patched python container.  Add system dependencies.
-
-FROM base-image AS deps-image
-COPY scripts/install-dependency-packages /tmp/build
-RUN ./install-dependency-packages
-
 # Add other system-level files
+
+# An /etc/passwd
+
+COPY scripts/make-root-user /tmp/build
+RUN ./make-root-user
 
 # /etc/profile.d parts
 
 RUN mkdir -p /etc/profile.d
 
-COPY profile.d/local01-nbstripjq.sh \
-     profile.d/local02-hub.sh \
-     profile.d/local03-pythonrc.sh \
-     profile.d/local04-path.sh \
-     profile.d/local05-term.sh \
+COPY profile.d/local06-showrspnotice.sh profile.d/local07-setupstack.sh \
      /etc/profile.d/
 
 # /etc/skel
 
 RUN for i in notebooks WORK DATA; do mkdir -p /etc/skel/${i}; done
 
-COPY skel/pythonrc /etc/skel/.pythonrc
+COPY skel/gitconfig /etc/skel/.gitconfig
+COPY skel/git-credentials /etc/skel/.git-credentials
+COPY skel/user_setups /etc/skel/notebooks/.user_setups
 
-# Might want to move these?  Or make them owned by jupyter user?
-# But for right now they need to live here as a compatibility layer if
-# nothing else.
+COPY runtime/lsst_kernel.json \
+       /usr/local/share/jupyter/kernels/lsst/kernel.json
 
-COPY jupyter_server/jupyter_server_config.json \
-     jupyter_server/jupyter_server_config.py \
-     /usr/local/etc/jupyter/
+COPY etc/rsp_notice /usr/local/etc
 
-COPY scripts/install-system-files /tmp/build
-RUN ./install-system-files
+FROM base-image AS user-image
 
-# Add our new unprivileged user.
-
-FROM deps-image AS user-image
+# Add our user again (base image removes /etc/passwd)
 
 COPY scripts/make-user /tmp/build
 RUN ./make-user
 
-# Give jupyterlab ownership to unprivileged user
+USER lsst_local:lsst_local
 
-RUN mkdir -p /usr/local/share/jupyterlab
-RUN chown jovyan:jovyan /usr/local/share/jupyterlab
+# Add the DM stack.
 
-# Switch to unprivileged user
+FROM user-image AS base-stack-image
+ARG tag
 
-USER jovyan:jovyan
+COPY scripts/install-dm-stack /tmp/build
+RUN ./install-dm-stack $tag
 
-FROM user-image AS jupyterlab-image
+COPY --chown=lsst_local:lsst_local etc/rsp_notice etc/20-logging.py \
+     /usr/local/share/jupyterlab/etc/
 
-COPY scripts/install-jupyterlab /tmp/build
-RUN ./install-jupyterlab
+COPY --chown=lsst_local:lsst_local runtime/lsst_kernel.json \
+    runtime/lsstlaunch.bash /usr/local/share/jupyterlab/
 
-FROM jupyterlab-image AS base-rsp-image
+COPY scripts/install-rsp-user /tmp/build
+RUN ./install-rsp-user
 
-RUN mkdir -p /usr/local/share/jupyterlab/etc
-COPY --chown=jovyan:jovyan \
-     jupyter_server/jupyter_server_config.json \
-     jupyter_server/jupyter_server_config.py
+FROM base-stack-image AS notebooks-rsp-image
 
-COPY --chown=jovyan:jovyan runtime/runlab \
-     /usr/local/share/jupyterlab/
+# Check out notebooks-at-build-time
+COPY scripts/install-notebooks /tmp/build
+RUN ./install-notebooks
 
-FROM base-rsp-image AS manifests-rsp-image
+FROM notebooks-rsp-image AS compat-rsp-image
+
+# Add compatibility layer to allow for transition from old to new
+# paths.
+
+COPY scripts/install-compat /tmp/build
+RUN ./install-compat
+
+FROM compat-rsp-image AS manifests-rsp-image
 
 # Get our manifests.  This has always been really useful for debugging
 # "what broke this week?"
@@ -84,18 +82,14 @@ COPY scripts/generate-versions /tmp/build
 RUN ./generate-versions
 
 FROM manifests-rsp-image AS rsp-image
+ARG version
 
+# Clean up.
 # This needs to be numeric, since we will remove /etc/passwd and friends
 # while we're running.
 USER 0:0
-
-# Add startup shim.
-COPY scripts/install-compat /tmp/build
-RUN  ./install-compat
-
 WORKDIR /
 
-# Clean up.
 COPY scripts/cleanup-files /
 RUN ./cleanup-files
 RUN rm ./cleanup-files
@@ -106,7 +100,10 @@ WORKDIR /tmp
 
 CMD ["/usr/local/share/jupyterlab/runlab"]
 
+# Overwrite Stack Container definitions with more-accurate-for-us ones
 ENV  DESCRIPTION="Rubin Science Platform Notebook Aspect"
 ENV  SUMMARY="Rubin Science Platform Notebook Aspect"
 
-LABEL description="Rubin Science Platform Notebook Aspect"
+LABEL description="Rubin Science Platform Notebook Aspect: $version" \
+       name="sciplat-lab:$version" \
+       version="$version"
