@@ -46,11 +46,23 @@ pip install uv
 # structlog and symbolicmode from lsst-rsp.
 
 uv pip install --no-build-isolation \
-    'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-46955' \
     jupyter-firefly-extensions \
     'lsst-rsp>=0.5.1' \
     structlog \
     'symbolicmode<3'
+
+# Add our extensions, built in debug mode.
+
+owd=$(pwd)
+mkdir -p /opt/lsst/software/jupyterlab/extensions
+cd /opt/lsst/software/jupyterlab/extensions
+git clone https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-46955
+cd rsp-jupyter-extensions
+uv pip install -e '.[test]'
+jupyter labextension develop . --overwrite
+jupyter server extension enable rsp_jupyter_extensions
+jlpm build
+cd ${owd}
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
