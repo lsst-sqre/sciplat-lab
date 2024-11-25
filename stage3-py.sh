@@ -56,7 +56,8 @@ uv pip install --no-build-isolation \
 owd=$(pwd)
 mkdir -p /opt/lsst/software/jupyterlab/extensions
 cd /opt/lsst/software/jupyterlab/extensions
-git clone https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-46955
+git clone -b tickets/DM-46955 \
+    https://github.com/lsst-sqre/rsp-jupyter-extensions
 cd rsp-jupyter-extensions
 uv pip install -e '.[test]'
 jupyter labextension develop . --overwrite
