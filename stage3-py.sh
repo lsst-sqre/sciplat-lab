@@ -52,6 +52,9 @@ uv pip install --no-build-isolation \
     structlog \
     'symbolicmode<3'
 
+# Rebuild Jupyterlab
+jupyter lab build --minimize=false
+
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
 
