@@ -26,8 +26,8 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 mamba install --no-banner -y \
      "rubin-env-rsp==${rubin_env_ver}"
 
-# Force newer firefly.  Unnecessary when rubin-env >= 9.0.0 appears.
-mamba install --no-banner -y 'firefly-client>=3'
+# Dash is broken--pending removal from rubin-env, do this
+mamba remove --force dash || /bin/true
 
 # As with conda->mamba, uv is compatible with pip but much faster.  It
 # matters less here, of course, because there are many fewer
@@ -51,9 +51,6 @@ uv pip install --no-build-isolation \
     'lsst-rsp>=0.5.1' \
     structlog \
     'symbolicmode<3'
-
-# Rebuild Jupyterlab
-jupyter lab build --minimize=false
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
