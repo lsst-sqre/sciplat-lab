@@ -50,7 +50,7 @@ pip install uv
 
 uv pip install --no-build-isolation \
     jupyter-firefly-extensions \
-    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-46955' \
+    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-46955B' \
     structlog \
     'symbolicmode<3'
 
@@ -59,7 +59,7 @@ uv pip install --no-build-isolation \
 owd=$(pwd)
 mkdir -p /opt/lsst/software/jupyterlab/extensions
 cd /opt/lsst/software/jupyterlab/extensions
-git clone -b tickets/DM-46955 \
+git clone -b tickets/DM-46955B \
     https://github.com/lsst-sqre/rsp-jupyter-extensions
 cd rsp-jupyter-extensions
 uv pip install -e '.[test]'
