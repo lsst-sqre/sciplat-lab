@@ -29,9 +29,6 @@ mamba install --no-banner -y \
 # Force newer firefly.  Unnecessary when rubin-env >= 9.0.0 appears.
 mamba install --no-banner -y 'firefly-client>=3'
 
-# dash is broken
-mamba remove --force dash
-
 # As with conda->mamba, uv is compatible with pip but much faster.  It
 # matters less here, of course, because there are many fewer
 # pip-installed packages.
