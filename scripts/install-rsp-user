@@ -8,10 +8,19 @@ stackdir=/opt/lsst/software/stack
 # the pin is only needed for releases, where the current version may have
 # moved ahead.
 
+# As of w_2024_50, the `mamba` alias provided by the stack fails because it
+# uses a function, `__reactivate_conda` provided by `conda.sh` which is
+# never sourced.
+# This is probably a larger problem, but above our pay grade.  Work around it.
+profdir=$stackdir/conda/etc/profile.d
+mv $profdir/mamba.sh $profdir/mamba.sh.save
+
 source $stackdir/loadLSST.bash
 
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json | \
 		    jq -r '.[0].version')
+
+
 # Refactor of rubin-env-rsp coming later to separate user packages from
 # Lab environment packages.
 mamba install --no-banner -y "rubin-env-rsp==${rubin_env_ver}"
@@ -40,3 +49,6 @@ uv pip install --no-build-isolation \
 # Clean caches
 mamba clean -a -y -f --no-banner
 uv cache clean
+
+# Put the alias back.
+mv $profdir/mamba.sh.save $profdir/mamba.sh
