@@ -45,10 +45,10 @@ pip install uv
 # not already provided by something in the conda env.  In this case,
 # structlog and symbolicmode from lsst-rsp.
 
-uv pip install --no-build-isolation \
+uv pip install --no-build-isolation --root-user-action \
     'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-48465' \
     jupyter-firefly-extensions \
-    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-48465' \
+    lsst-rsp \
     structlog \
     'symbolicmode<3'
 
