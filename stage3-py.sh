@@ -20,11 +20,11 @@ fi
 # Never allow the installation to upgrade rubin_env.  Generally enforcing
 # the pin is only needed for releases, where the current version may have
 # moved ahead.
-rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
-                    | jq -r '.[0].version')
+rubin_env_ver=$(mamba list rubin-env$ --no-banner --json |
+    jq -r '.[0].version')
 # Do the rest of the installation.
 mamba install --no-banner -y \
-     "rubin-env-rsp==${rubin_env_ver}"
+    "rubin-env-rsp==${rubin_env_ver}"
 
 # Force newer firefly.  Unnecessary when rubin-env >= 9.0.0 appears.
 mamba install --no-banner -y 'firefly-client>=3'
@@ -46,7 +46,7 @@ pip install uv
 # structlog and symbolicmode from lsst-rsp.
 
 uv pip install --no-build-isolation \
-    rsp-jupyter-extensions \
+    'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-48733/alternate-times-square-template-endpoint' \
     jupyter-firefly-extensions \
     'lsst-rsp>=0.6.6' \
     structlog \
@@ -65,5 +65,5 @@ pip cache purge
 uv cache clean
 
 # Create package version docs.
-uv pip freeze > ${verdir}/requirements-stack.txt
-mamba env export > ${verdir}/conda-stack.yml
+uv pip freeze >${verdir}/requirements-stack.txt
+mamba env export >${verdir}/conda-stack.yml
