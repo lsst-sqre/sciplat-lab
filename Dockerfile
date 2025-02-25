@@ -22,7 +22,7 @@ COPY profile.d/local06-showrspnotice.sh profile.d/local07-setupstack.sh \
 
 # /etc/skel
 
-RUN for i in notebooks WORK DATA; do mkdir -p /etc/skel/${i}; done
+RUN mkdir -p /etc/skel/notebooks
 
 COPY skel/gitconfig /etc/skel/.gitconfig
 COPY skel/git-credentials /etc/skel/.git-credentials
