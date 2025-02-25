@@ -1,10 +1,8 @@
 #!/bin/sh
 set -e
 
-# Set up default user directory layout
-for i in notebooks WORK DATA idleculler ; do \
-    mkdir -p /etc/skel/${i} ; \
-done
+# Set up default user directory layout, which is just a "notebooks" directory.
+mkdir -p /etc/skel/notebooks
 
 # We renamed "lsst" to "lsst_lcl" because "lsst" was a real GitHub group
 # that people were in, when we were using GH as our auth source.  It still
@@ -28,14 +26,11 @@ rm -f /etc/passwd  /etc/shadow  /etc/group  /etc/gshadow \
 
 # Check out notebooks-at-build-time
 # Do a shallow clone (important for the tutorials)
-branch="prod"
-notebooks="lsst-sqre/system-test rubin-dp0/tutorial-notebooks"
 nbdir="/opt/lsst/software/notebooks-at-build-time"
 owd=$(pwd)
 source ${LOADRSPSTACK}
 mkdir -p ${nbdir}
 cd ${nbdir}
-for n in ${notebooks}; do
-    git clone --depth 1 -b ${branch} "https://github.com/${n}"
-done
+git clone --depth 1 -b prod "https://github.com/lsst-sqre/system-test"
+git clone --depth 1 "https://github.com/lsst/tutorial-notebooks"
 cd ${owd}
