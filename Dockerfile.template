@@ -28,7 +28,7 @@ COPY profile.d/local01-nbstripjq.sh profile.d/local02-hub.sh \
 
 # /etc/skel
 
-RUN for i in notebooks WORK DATA; do mkdir -p /etc/skel/${i}; done
+RUN mkdir -p /etc/skel/notebooks
 
 COPY skel/pythonrc /etc/skel/.pythonrc
 COPY skel/gitconfig /etc/skel/.gitconfig

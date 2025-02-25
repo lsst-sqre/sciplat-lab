@@ -9,6 +9,5 @@ mkdir -p "${nbdir}"
 branch="prod"
 notebooks="lsst-sqre/system-test rubin-dp0/tutorial-notebooks"
 cd ${nbdir}
-for n in ${notebooks}; do
-    git clone --depth 1 -b ${branch} "https://github.com/${n}"
-done
+git clone --depth 1 -b prod "https://github.com/lsst-sqre/system-test"
+git clone --depth 1 "https://github.com/lsst/tutorial-notebooks"
