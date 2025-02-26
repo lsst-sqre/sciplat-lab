@@ -32,5 +32,5 @@ source ${LOADRSPSTACK}
 mkdir -p ${nbdir}
 cd ${nbdir}
 git clone --depth 1 -b prod "https://github.com/lsst-sqre/system-test"
-git clone --depth 1 "https://github.com/lsst/tutorial-notebooks"
+git clone --depth 1 -b main "https://github.com/lsst/tutorial-notebooks"
 cd ${owd}
