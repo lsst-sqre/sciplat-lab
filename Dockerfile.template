@@ -49,6 +49,7 @@ COPY pythonrc /etc/skel/.pythonrc
 COPY gitconfig /etc/skel/.gitconfig
 COPY git-credentials /etc/skel/.git-credentials
 COPY user_setups /etc/skel/notebooks/.user_setups
+COPY nfsmount.conf /etc/nfsmount.conf
 COPY lsst_kernel.json lsstlaunch.bash runlab.sh 20-logging.py \
       ${jl}/
 # If running noninteractively, configuration configmap must be mounted at
