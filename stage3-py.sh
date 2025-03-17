@@ -43,9 +43,9 @@ pip install uv
 # structlog and symbolicmode from lsst-rsp.
 
 uv pip install --no-build-isolation \
-    'rsp-jupyter-extensions>=0.15.0' \
+    'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-49490' \
     jupyter-firefly-extensions \
-    'lsst-rsp>=0.7.1' \
+    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-49490' \
     structlog \
     'symbolicmode<3'
 
