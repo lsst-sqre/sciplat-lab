@@ -10,6 +10,11 @@ fallback () {
         setup lsst_distrib
     fi
     setup display_firefly
+    LSST_KAFKA_SECURITY_USERNAME=$(cat ${LSST_KAFKA_PASSFILE} | \
+				       cut -d: -f1)
+    LSST_KAFKA_SECURITY_PASSWORD=$(cat ${LSST_KAFKA_PASSFILE} | \
+				       cut -d: -f2)
+    export LSST_KAFKA_SECURITY_USERNAME LSST_KAFKA_SECURITY_PASSWORD
 }
 
 if [ -z "${RSP_SITE_TYPE}" ]; then
@@ -20,6 +25,11 @@ else
             source /opt/lsst/software/stack/loadLSST.bash	    
 	    setup lsst_sitcom
 	    setup display_firefly
+	    LSST_KAFKA_SECURITY_USERNAME=$(cat ${LSST_KAFKA_PASSFILE} | \
+					       cut -d: -f1)
+	    LSST_KAFKA_SECURITY_PASSWORD=$(cat ${LSST_KAFKA_PASSFILE} | \
+					       cut -d: -f2)
+	    export LSST_KAFKA_SECURITY_USERNAME LSST_KAFKA_SECURITY_PASSWORD
 	    ;;
 	staff)
             source /opt/lsst/software/stack/loadLSST.bash
