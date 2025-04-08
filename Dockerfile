@@ -13,6 +13,9 @@ WORKDIR /tmp/build
 COPY scripts/make-root-user /tmp/build
 RUN ./make-root-user
 
+COPY scripts/install-system-packages /tmp/build
+RUN ./install-system-packages
+
 # /etc/profile.d parts
 
 RUN mkdir -p /etc/profile.d
@@ -59,13 +62,7 @@ COPY --chown=lsst_local:lsst_local runtime/lsst_kernel.json \
 COPY scripts/install-rsp-user /tmp/build
 RUN ./install-rsp-user
 
-FROM base-stack-image AS notebooks-rsp-image
-
-# Check out notebooks-at-build-time
-COPY scripts/install-notebooks /tmp/build
-RUN ./install-notebooks
-
-FROM notebooks-rsp-image AS compat-rsp-image
+FROM base-stack-image AS compat-rsp-image
 
 # Add compatibility layer to allow for transition from old to new
 # paths.

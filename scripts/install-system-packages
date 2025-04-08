@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -x
+
+set -euo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+apt -y update
+apt -y upgrade
+
+apt -y install ssh

@@ -4,6 +4,14 @@ set -euo pipefail
 
 # Create user and home directory.
 groupadd -g 0 root
-grpconv
 useradd -u 0 -g 0 -d / -s /bin/sh root
+
+# And since we're going to be adding packages: messagebus, nogroup,
+# and _apt too.
+groupadd -g 108 messagebus
+groupadd -g 65534 nogroup
+useradd -u 42 -g 65534 -d /nonexistent -s /usr/sbin/nologin _apt
+
+# And their shadow files.
+grpconv
 pwconv
