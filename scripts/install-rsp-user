@@ -52,3 +52,14 @@ uv cache clean
 
 # Put the alias back.
 mv $profdir/mamba.sh.save $profdir/mamba.sh
+
+# Copy the Python icon pageantry to our new kernel dir
+mkdir -p /usr/local/share/jupyter/kernels/lsst
+cp /usr/local/share/jupyterlab/venv/share/jupyter/kernels/python3/logo* \
+   /usr/local/share/jupyter/kernels/lsst/
+
+# Remove the default "python3" kernels
+for d in /usr/local/share/jupyterlab/venv \
+	 /opt/lsst/software/stack/conda/envs/lsst-scipipe-10.0.0 ; do
+    rm -rf ${d}/share/jupyter/kernels/python3
+done
