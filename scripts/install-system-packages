@@ -8,3 +8,9 @@ apt -y update
 apt -y upgrade
 
 apt -y install ssh
+
+# Override RJE
+
+. /usr/local/share/jupyterlab/venv/bin/activate
+pip install \
+    git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-49131
