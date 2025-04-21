@@ -6,5 +6,14 @@ for f in passwd group shadow gshadow; do
     rm /etc/${f} /etc/${f}-
 done
 
+# Copy logos across
+JLV=/usr/local/share/jupyterlab/venv
+cp ${JLV}/share/jupyter/kernels/python3/logo* \
+     /usr/local/share/jupyter/kernels/lsst
+# Remove default kernels
+for d in ${JLV} /opt/lsst/software/stack/conda/envs/lsst-scipipe-10.0.0 ; do
+    rm -rf ${d}/share/jupyter/kernels/python3
+done
+
 rm -rf /tmp/* /tmp/.*  # Modern Unixes don't recursively remove ".."
 
