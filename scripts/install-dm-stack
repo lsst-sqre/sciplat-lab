@@ -6,9 +6,14 @@ set -eo pipefail
 
 TAG=$1
 
+# Force the issue
+SHELL=bash
+export SHELL
+
 stackdir=/opt/lsst/software/stack
 sbt=https://raw.githubusercontent.com/lsst/shebangtron/main/shebangtron
 
+mkdir -p $stackdir
 cd $stackdir
 curl -OL https://ls.st/lsstinstall
 chmod u+x lsstinstall

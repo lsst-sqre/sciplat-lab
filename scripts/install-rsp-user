@@ -4,6 +4,9 @@ set -x
 set -eo pipefail
 stackdir=/opt/lsst/software/stack
 
+SHELL=bash
+export SHELL
+
 # Never allow the installation to upgrade rubin_env.  Generally enforcing
 # the pin is only needed for releases, where the current version may have
 # moved ahead.
