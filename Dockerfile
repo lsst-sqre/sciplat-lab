@@ -36,27 +36,18 @@ COPY runtime/lsst_kernel.json \
 
 COPY etc/rsp_notice /usr/local/etc
 
-FROM base-image AS user-image
-
-# Add our user again (base image removes /etc/passwd)
-
-COPY scripts/make-user /tmp/build
-RUN ./make-user
-
-USER lsst_local:lsst_local
-
 # Add the DM stack.
 
-FROM user-image AS base-stack-image
+FROM base-image AS base-stack-image
 ARG tag
 
 COPY scripts/install-dm-stack /tmp/build
 RUN ./install-dm-stack $tag
 
-COPY --chown=lsst_local:lsst_local etc/rsp_notice etc/20-logging.py \
+COPY etc/rsp_notice etc/20-logging.py \
      /usr/local/share/jupyterlab/etc/
 
-COPY --chown=lsst_local:lsst_local runtime/lsst_kernel.json \
+COPY runtime/lsst_kernel.json \
     runtime/lsstlaunch.bash /usr/local/share/jupyterlab/
 
 COPY scripts/install-rsp-user /tmp/build
@@ -91,8 +82,10 @@ COPY scripts/cleanup-files /
 RUN ./cleanup-files
 RUN rm ./cleanup-files
 
-# Back to unprivileged
-USER 1000:1000
+# Run by default as an unprivileged user.  In real life, the Nublado
+# controller will set this correctly.  The default is conventionally
+# nobody:nogroup.
+USER 65534:65534
 WORKDIR /tmp
 
 CMD ["/usr/local/share/jupyterlab/runlab"]

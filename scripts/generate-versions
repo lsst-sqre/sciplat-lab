@@ -19,6 +19,8 @@ python -m uv pip list > "jupyterlab-python"
 deactivate
 
 # Now the stack
+SHELL=bash
+export SHELL
 vi_dir="/opt/lsst/software/jupyterlab/versions-installed"
 source /opt/lsst/software/stack/loadLSST.bash
 mkdir -p ${vi_dir}

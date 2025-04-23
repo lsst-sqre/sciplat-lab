@@ -61,7 +61,7 @@ endif
 # kicking off scheduled builds.
 
 ifeq ($(input),)
-    input = ghcr.io/lsst-sqre/nublado-jupyterlab-base:tickets-DM-47346
+    input = ghcr.io/lsst-sqre/nublado-jupyterlab-base:8.8.3
 endif
 
 # Some day we might use a different build tool.  If you have a new enough
