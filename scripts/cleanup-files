@@ -2,6 +2,12 @@
 set -x
 set -euo pipefail
 
+
+# Install lsst-rsp to UI context too; do at very end, like this.
+source /usr/local/share/jupyterlab/venv/bin/activate
+uv pip install --no-build-isolation \
+       'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-50484'
+
 for f in passwd group shadow gshadow; do
     rm /etc/${f} /etc/${f}-
 done
