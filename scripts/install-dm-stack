@@ -6,9 +6,10 @@ set -eo pipefail
 
 TAG=$1
 
-# Force the issue
 SHELL=bash
 export SHELL
+MAMBA_NO_BANNER=1
+export MAMBA_NO_BANNER
 
 stackdir=/opt/lsst/software/stack
 sbt=https://raw.githubusercontent.com/lsst/shebangtron/main/shebangtron
@@ -38,4 +39,4 @@ done
 curl -sSL $sbt | python
 setup lsst_distrib
 
-mamba clean -a -f -y --no-banner # Not clear that -f is safe.
+mamba clean -a -f -y  # Not clear that -f is safe.
