@@ -53,15 +53,11 @@ endif
 
 # Our default input image is ghcr.io/lsst-sqre/nublado-jupyterlab-base
 #
-# Right now the tag has to be manually specified, but a little work on the
-# nublado side should at least get us to tag latest on tagged uploads from
-# main.
-#
-# You can always specify it directly, but this should be a sane default for
-# kicking off scheduled builds.
+# The default of "latest" should generally be correct, but you can override
+# this manually if you like.
 
 ifeq ($(input),)
-    input = ghcr.io/lsst-sqre/nublado-jupyterlab-base:8.8.3
+    input = ghcr.io/lsst-sqre/nublado-jupyterlab-base:latest
 endif
 
 # Some day we might use a different build tool.  If you have a new enough
