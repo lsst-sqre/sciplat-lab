@@ -20,7 +20,9 @@ RUN ./install-system-packages
 
 RUN mkdir -p /etc/profile.d
 
-COPY profile.d/local06-showrspnotice.sh profile.d/local07-setupstack.sh \
+COPY profile.d/local06-showrspnotice.sh \
+     profile.d/local07-mambarootprefix.sh \
+     profile.d/local08-setupstack.sh \
      /etc/profile.d/
 
 # /etc/skel
