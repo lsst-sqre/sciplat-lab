@@ -171,7 +171,7 @@ retag:
 	$(DOCKER) pull ghcr.io/lsst-sqre/sciplat-lab:$(tag) && \
 	    outputs=$$(echo $(image) | cut -d ',' -f 1- | tr ',' ' ') && \
 	    for o in $${outputs}; do \
-	        $(DOCKER) tag ghcr.io/lsst-sqre/sciplat-lab::$(tag) $${o}:$${supplementary} ; \
+	        $(DOCKER) tag ghcr.io/lsst-sqre/sciplat-lab:$(tag) $${o}:$${supplementary} ; \
 	        $(DOCKER) push $${o}:$${supplementary} ; \
 	    done ; \
 	fi
