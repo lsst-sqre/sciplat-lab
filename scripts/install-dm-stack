@@ -9,6 +9,9 @@ TAG=$1
 SHELL=bash
 export SHELL
 
+MAMBA_ROOT_PREFIX="/opt/lsst/software/stack/conda"
+export MAMBA_ROOT_PREFIX
+
 stackdir=/opt/lsst/software/stack
 sbt=https://raw.githubusercontent.com/lsst/shebangtron/main/shebangtron
 
