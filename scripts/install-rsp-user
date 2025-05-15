@@ -7,6 +7,9 @@ stackdir=/opt/lsst/software/stack
 SHELL=bash
 export SHELL
 
+MAMBA_ROOT_PREFIX="/opt/lsst/software/stack/conda"
+export MAMBA_ROOT_PREFIX
+
 # Never allow the installation to upgrade rubin_env.  Generally enforcing
 # the pin is only needed for releases, where the current version may have
 # moved ahead.
@@ -45,6 +48,15 @@ uv pip install --no-build-isolation \
     'symbolicmode<3' \
     'jupyter_firefly_extensions>=0.15.0'
 
+# Turn off console
+jupyter labextension disable @jupyterlab/console-extension
+jupyter labextension lock @jupyterlab/console-extension
+
 # Clean caches
 conda clean -a -y -f
 uv cache clean
+
+# Turn off console in system python too
+source /usr/local/share/jupyterlab/venv/bin/activate
+jupyter labextension disable @jupyterlab/console-extension
+jupyter labextension lock @jupyterlab/console-extension
