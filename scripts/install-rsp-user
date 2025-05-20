@@ -46,7 +46,8 @@ uv pip install --no-build-isolation \
     'lsst-rsp>=0.7.1' \
     structlog \
     'symbolicmode<3' \
-    'jupyter_firefly_extensions>=0.15.0'
+    'jupyter_firefly_extensions>=0.15.0' \
+    'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
 
 # Turn off console
 jupyter labextension disable @jupyterlab/console-extension
@@ -56,7 +57,11 @@ jupyter labextension lock @jupyterlab/console-extension
 conda clean -a -y -f
 uv cache clean
 
-# Turn off console in system python too
+# Turn off console in UI python too
 source /usr/local/share/jupyterlab/venv/bin/activate
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
+
+# Install branch RJE into UI python
+uv pip install --no-build-isolation \
+   'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
