@@ -42,15 +42,15 @@ pip install uv
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # structlog and symbolicmode from lsst-rsp.
-uv pip install --no-build-isolation hatchling \
-    'hatch-nodejs-version>=0.3.2' \
-    'jupyterlab>=4.0.0,<5'
+# uv pip install --no-build-isolation hatchling \
+#     'hatch-nodejs-version>=0.3.2' \
 uv pip install --no-build-isolation \
     'lsst-rsp>=0.7.1' \
     structlog \
     'symbolicmode<3' \
     'jupyter_firefly_extensions>=0.15.0' \
-    'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
+    # 'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
+uv pip install 'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
 
 # Turn off console
 jupyter labextension disable @jupyterlab/console-extension
@@ -66,8 +66,8 @@ jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
 
 # Install branch RJE into UI python
-uv pip install --no-build-isolation hatchling \
-    'hatch-nodejs-version>=0.3.2' \
-    'jupyterlab>=4.0.0,<5'
-uv pip install --no-build-isolation \
-    'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
+# uv pip install --no-build-isolation hatchling \
+#     'hatch-nodejs-version>=0.3.2' \
+# uv pip install --no-build-isolation \
+#     'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
+uv pip install 'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
