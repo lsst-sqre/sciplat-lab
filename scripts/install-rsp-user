@@ -42,7 +42,7 @@ pip install uv
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # structlog and symbolicmode from lsst-rsp.
-uv pip install --no-build-isolation hatchling
+uv pip install --no-build-isolation hatchling 'hatch-nodejs-version>=0.3.2'
 uv pip install --no-build-isolation \
     'lsst-rsp>=0.7.1' \
     structlog \
@@ -64,6 +64,6 @@ jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
 
 # Install branch RJE into UI python
-uv pip install --no-build-isolation hatchling
+uv pip install --no-build-isolation hatchling 'hatch-nodejs-version>=0.3.2'
 uv pip install --no-build-isolation \
     'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
