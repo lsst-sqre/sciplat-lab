@@ -47,6 +47,7 @@ uv pip install --no-build-isolation \
     structlog \
     'symbolicmode<3' \
     'jupyter_firefly_extensions>=0.15.0' \
+    'hatchling' \
     'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
 
 # Turn off console
@@ -64,4 +65,5 @@ jupyter labextension lock @jupyterlab/console-extension
 
 # Install branch RJE into UI python
 uv pip install --no-build-isolation \
-   'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
+    'hatchling' \
+    'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51011'
