@@ -46,7 +46,8 @@ uv pip install --no-build-isolation \
     'lsst-rsp>=0.7.1' \
     structlog \
     'symbolicmode<3' \
-    'jupyter_firefly_extensions>=0.15.0'
+    'jupyter_firefly_extensions>=0.15.0' \
+    'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-49959'
 
 # Turn off console
 jupyter labextension disable @jupyterlab/console-extension
@@ -58,5 +59,10 @@ uv cache clean
 
 # Turn off console in system python too
 source /usr/local/share/jupyterlab/venv/bin/activate
+
+# Install updated rje; no-build-isolation doesn't work in UI venv
+uv pip install \
+   'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-49959'
+
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
