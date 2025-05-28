@@ -26,7 +26,9 @@ COPY profile.d/local06-showrspnotice.sh \
 
 # /etc/skel
 
-RUN mkdir -p /etc/skel/notebooks
+RUN mkdir -p /etc/skel/notebooks/tutorials
+COPY skel/landing_page.md /etc/skel/notebooks/tutorials/landing_page.md
+COPY skel/logo_for_header.png /etc/skel/notebooks/tutorials/logo_for_header.png
 
 COPY skel/gitconfig /etc/skel/.gitconfig
 COPY skel/git-credentials /etc/skel/.git-credentials
