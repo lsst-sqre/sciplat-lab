@@ -60,3 +60,7 @@ uv cache clean
 source /usr/local/share/jupyterlab/venv/bin/activate
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
+
+# Fix up UI lsst-rsp too
+source /usr/local/share/jupyterlab/venv/bin/activate
+uv pip install 'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-51606'
