@@ -43,10 +43,11 @@ pip install uv
 # not already provided by something in the conda env.  In this case,
 # structlog and symbolicmode from lsst-rsp.
 uv pip install --no-build-isolation \
-    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-51606' \
-    structlog \
-    'symbolicmode<3' \
-    'jupyter_firefly_extensions>=0.15.0'
+   'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-51608' \
+   'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51608' \
+   structlog \
+   'symbolicmode<3' \
+   'jupyter_firefly_extensions>=0.15.0'
 
 # Turn off console
 jupyter labextension disable @jupyterlab/console-extension
@@ -56,11 +57,14 @@ jupyter labextension lock @jupyterlab/console-extension
 conda clean -a -y -f
 uv cache clean
 
-# Turn off console in system python too
 source /usr/local/share/jupyterlab/venv/bin/activate
+# Fix up UI lsst-rsp too
+source /usr/local/share/jupyterlab/venv/bin/activate
+uv pip install \
+   'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-51608' \
+   'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-51608'
+
+# Turn off console in system python too
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
 
-# Fix up UI lsst-rsp too
-source /usr/local/share/jupyterlab/venv/bin/activate
-uv pip install 'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-51606'
