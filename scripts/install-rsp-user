@@ -24,10 +24,15 @@ source $stackdir/loadLSST.bash
 
 rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 
-
 # Refactor of rubin-env-rsp coming later to separate user packages from
 # Lab environment packages.
 conda install -y "rubin-env-rsp==${rubin_env_ver}"
+
+# And then install lsdb.  Without the pin we get 0.2.4, which is too ancient
+# to work.  Not sure why that happens yet.  Once lsdb gets into rubin-env-rsp
+# (11.0.0, probably) then we can remove this.
+
+conda install -y "lsdb>=0.6.0"
 
 # uv is compatible with pip but much faster.
 pip install uv
