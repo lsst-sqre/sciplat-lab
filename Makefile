@@ -60,6 +60,13 @@ ifeq ($(input),)
     input = ghcr.io/lsst-sqre/nublado-jupyterlab-base:latest
 endif
 
+# Get the run number for release/rc builds.  Set to 1 for local runs, but
+# of course you can set your own environment variable value if you want.
+build_number = $(GITHUB_RUN_NUMBER)
+ifeq ($(build_number),)
+    build_number := 1
+endif
+
 # Some day we might use a different build tool.  If you have a new enough
 #  docker, you probably want to set DOCKER_BUILDKIT in your environment.
 #  ... except that as of August 6, 2023, the new builder (which you get with
@@ -77,6 +84,15 @@ image := $(image)
 #   added at the end after an underscore.
 version := $(tag)
 version := $(version:v%=r%)
+
+# Get tag type
+tag_type = $(shell echo $(version) | cut -c 1)
+
+# If it is a release or release candidate version, inject the build number
+# into the tag.
+ifeq ($(tag_type),r)
+  version := $(version)_rsp$(build_number)
+endif
 
 release_branch := main
 branch := $(shell git rev-parse --abbrev-ref HEAD)
@@ -96,7 +112,6 @@ endif
 #  container should always point to the latest weekly or release, but not a
 #  daily, since we make no guarantees that the daily is fit for purpose.
 
-tag_type = $(shell echo $(version) | cut -c 1)
 ifeq ($(tag_type),w)
     ltype := latest_weekly
     latest := latest
