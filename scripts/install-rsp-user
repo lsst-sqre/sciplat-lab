@@ -28,12 +28,6 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 # Lab environment packages.
 conda install -y "rubin-env-rsp==${rubin_env_ver}"
 
-# And then install lsdb.  Without the pin we get 0.2.4, which is too ancient
-# to work.  Not sure why that happens yet.  Once lsdb gets into rubin-env-rsp
-# (11.0.0, probably) then we can remove this.
-
-conda install -y "lsdb>=0.6.0"
-
 # uv is compatible with pip but much faster.
 pip install uv
 
@@ -43,6 +37,13 @@ pip install uv
 # they need, we won't upgrade it.  But if it isn't already installed, we'll
 # just take the latest available.  `--no-build-isolation` ensures that any
 # source packages use C++ libraries from conda-forge.
+
+# Try lsdb separately, do *not* say "--no-build-isolation" because we need to
+# pull in a newer pyarrow.
+
+# Once rubin-env 11 is released, lsdb (and a compatible pyarrow) will be in
+# rubin-env-rsp, and we can stop doint this.
+uv pip install 'lsdb>=0.6.3'
 
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
