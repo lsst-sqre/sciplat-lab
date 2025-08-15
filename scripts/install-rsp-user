@@ -48,8 +48,10 @@ uv pip install 'lsdb>=0.6.3'
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # structlog and symbolicmode from lsst-rsp.
+
+# lsst-rsp from main, not pypi, for dask dashboard fix
 uv pip install --no-build-isolation \
-    'lsst-rsp>=0.7.1' \
+    'git+https://github.com/lsst-sqre/lsst-rsp' \
     structlog \
     'symbolicmode<3' \
     'jupyter_firefly_extensions>=0.15.0'
@@ -64,5 +66,10 @@ uv cache clean
 
 # Turn off console in system python too
 source /usr/local/share/jupyterlab/venv/bin/activate
+
+# But first fix lsst-rsp
+uv pip install 'git+https://github.com/lsst-sqre/lsst-rsp'
+
+# Then disable console
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
