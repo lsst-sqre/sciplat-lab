@@ -50,7 +50,7 @@ uv pip install 'lsdb>=0.6.3'
 # structlog and symbolicmode from lsst-rsp.
 uv pip install --no-build-isolation \
     'jupyter_firefly_extensions>=0.15.0' \
-    'lsst-rsp>=0.7.1' \
+    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-52265' \
     structlog \
     'symbolicmode<3' \
     tdastro
@@ -67,3 +67,7 @@ uv cache clean
 source /usr/local/share/jupyterlab/venv/bin/activate
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
+
+# Install updated lsst-rsp into system python
+uv pip install --no-build-isolation \
+    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-52265'
