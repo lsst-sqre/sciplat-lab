@@ -42,17 +42,18 @@ pip install uv
 # pull in a newer pyarrow.
 
 # Once rubin-env 11 is released, lsdb (and a compatible pyarrow) will be in
-# rubin-env-rsp, and we can stop doint this.
+# rubin-env-rsp, and we can stop doing this.
 uv pip install 'lsdb>=0.6.3'
 
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # structlog and symbolicmode from lsst-rsp.
 uv pip install --no-build-isolation \
+    'jupyter_firefly_extensions>=0.15.0' \
     'lsst-rsp>=0.7.1' \
     structlog \
     'symbolicmode<3' \
-    'jupyter_firefly_extensions>=0.15.0'
+    tdastro
 
 # Turn off console
 jupyter labextension disable @jupyterlab/console-extension
