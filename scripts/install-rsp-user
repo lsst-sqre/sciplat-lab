@@ -50,7 +50,12 @@ uv pip install 'lsdb>=0.6.3'
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # structlog and symbolicmode from lsst-rsp.
+
+#
+# ipython-genutils is an undeclared dependency of ipympl.  This will go into
+# the base and rubin-env-rsp.
 uv pip install --no-build-isolation \
+    ipython-genutils \
     'jupyter_firefly_extensions>=0.15.0' \
     'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-52265' \
     structlog \
@@ -69,6 +74,7 @@ source /usr/local/share/jupyterlab/venv/bin/activate
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
 
-# Install updated lsst-rsp into system python
+# Install updated lsst-rsp and ipython-genutils into system python
 uv pip install --no-build-isolation \
+    ipython-genutils \
     'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-52265'
