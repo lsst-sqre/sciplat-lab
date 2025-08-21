@@ -45,6 +45,8 @@ pip install uv
 # rubin-env-rsp, and we can stop doing this.
 uv pip install 'lsdb>=0.6.3'
 
+# 'sncosmo' 'tdastro'  later...
+
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # structlog and symbolicmode from lsst-rsp.
@@ -52,8 +54,7 @@ uv pip install --no-build-isolation \
     'jupyter_firefly_extensions>=0.15.0' \
     'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-52265' \
     structlog \
-    'symbolicmode<3' \
-    tdastro
+    'symbolicmode<3'
 
 # Turn off console
 jupyter labextension disable @jupyterlab/console-extension
