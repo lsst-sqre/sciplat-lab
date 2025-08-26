@@ -28,6 +28,8 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 # Lab environment packages.
 conda install -y "rubin-env-rsp==${rubin_env_ver}"
 
+conda install -y ipython_genutils  # Until added to rubin-env-rsp
+
 # uv is compatible with pip but much faster.
 pip install uv
 
