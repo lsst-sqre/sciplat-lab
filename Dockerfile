@@ -8,10 +8,11 @@ WORKDIR /tmp/build
 
 # Add other system-level files
 
-# An /etc/passwd
+# An /etc/passwd and /etc/group
 
-COPY scripts/make-root-user /tmp/build
-RUN ./make-root-user
+COPY etc/passwd /etc/passwd
+COPY etc/group  /etc/group
+RUN grpconv && pwconv
 
 COPY scripts/install-system-packages /tmp/build
 RUN ./install-system-packages
