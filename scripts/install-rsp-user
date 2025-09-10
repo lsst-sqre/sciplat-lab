@@ -28,7 +28,9 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 # Lab environment packages.
 conda install -y "rubin-env-rsp==${rubin_env_ver}"
 
-conda install -y ipython_genutils  # Until added to rubin-env-rsp
+conda install -y \
+      ipython_genutils \
+      jupyterlab-spellchecker # Until added to rubin-env-rsp
 
 # uv is compatible with pip but much faster.
 pip install uv
@@ -44,7 +46,7 @@ pip install uv
 # pull in a newer pyarrow.
 
 # Once rubin-env 11 is released, lsdb (and a compatible pyarrow) will be in
-# rubin-env-rsp, and we can stop doint this.
+# rubin-env-rsp, and we can stop doing this.
 uv pip install 'lsdb>=0.6.3'
 
 # "--no-build-isolation" means we're also responsible for the dependencies
