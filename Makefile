@@ -67,12 +67,7 @@ ifeq ($(build_number),)
     build_number := 1
 endif
 
-# Some day we might use a different build tool.  If you have a new enough
-#  docker, you probably want to set DOCKER_BUILDKIT in your environment.
-#  ... except that as of August 6, 2023, the new builder (which you get with
-#  DOCKER_BUILDKIT=1, or by default as of that date) just hangs at the
-#  image-writing stage on GitHub Actions.  So we're going to work around it,
-#  at least until legacy build support is removed.
+# We're going to try docker buildx
 DOCKER := docker
 export DOCKER_BUILDKIT := 1
 
@@ -169,11 +164,12 @@ push: image
 # I keep getting this wrong, so make it work either way.
 build: image
 
+# We use `--load` because tagging happens in the push stage.
 image:
 	img=$$(echo $(image) | cut -d ',' -f 1) && \
 	more=$$(echo $(image) | cut -d ',' -f 2- | tr ',' ' ') && \
-	$(DOCKER) build ${platform} --build-arg input=$(input) \
-          --build-arg image=$${img} --build-arg tag=$(tag) \
+	$(DOCKER) buildx build ${platform} --build-arg input=$(input) \
+          --build-arg image=$${img} --build-arg tag=$(tag) --load \
           -t $${img}:$(version) . && \
 	for m in $${more}; do \
 	    $(DOCKER) tag $${img}:$(version) $${m}:$(version) ; \
