@@ -74,6 +74,7 @@ endif
 #  image-writing stage on GitHub Actions.  So we're going to work around it,
 #  at least until legacy build support is removed.
 DOCKER := docker
+export DOCKER_BUILDKIT := 1
 
 # Force to simply-expanded variables, for when we add the supplementary tag.
 tag := $(tag)
