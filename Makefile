@@ -1,4 +1,4 @@
-# We need four pieces of information to build the container:
+# We need five pieces of information to build the container:
 #  tag is the tag on the input DM Stack container.  It is mandatory.
 #  image is the Docker repository image we're pushing to; we can use the
 #   default if we don't specify it, which goes to Docker Hub, Google
@@ -10,6 +10,9 @@
 #   alone.
 #  supplementary is an additional tag, which forces the build to an "exp_"
 #   (that is, experimental) tag and adds "_" plus the supplement at the end.
+#  platform specifies the target architecture.  It is optional, and should
+#   be one of "amd64" or "arm64".  If unspecified, "amd64" is assumed.  This
+#   will be added to the end of the tag with a hyphen.
 
 # Therefore: the typical use of the Makefile would look like:
 #   make tag=w_2024_50
@@ -20,9 +23,12 @@
 # To tag as experimental "foo" (-> exp_w_2023_50_foo):
 #   make tag=w_2024_50 supplementary=foo
 
-# To start from a different input container:
+# To start from a different input container (note: escape colon!):
 #   make tag=w_2024_50 \
-#     input=ghcr.io/lsst-sqre/nublado-jupyterlab-base:hotfix/some-tag
+#     input=ghcr.io/lsst-sqre/nublado-jupyterlab-base\:hotfix/some-tag
+
+# To build an ARM version
+#   make tag=w_2024_50 platform=arm64
 
 # There are three targets: image, push, and retag.
 
@@ -54,10 +60,11 @@ endif
 # Our default input image is ghcr.io/lsst-sqre/nublado-jupyterlab-base
 #
 # The default of "latest" should generally be correct, but you can override
-# this manually if you like.
+# this manually if you like.  Note that you need to escape the colon before
+# the tag in GNU Make 4.x and later.
 
 ifeq ($(input),)
-    input = ghcr.io/lsst-sqre/nublado-jupyterlab-base:latest
+    input = ghcr.io/lsst-sqre/nublado-jupyterlab-base\:latest
 endif
 
 # Get the run number for release/rc builds.  Set to 1 for local runs, but
@@ -75,6 +82,16 @@ endif
 #  at least until legacy build support is removed.
 DOCKER := docker
 export DOCKER_BUILDKIT=1
+
+# Normalize platform
+ifeq ($(platform),)
+    platform := amd64
+endif
+ifneq ($(platform), amd64)
+    ifneq ($(platform), arm64)
+        $(error platform must be 'amd64' or 'arm64')
+    endif
+endif
 
 # Force to simply-expanded variables, for when we add the supplementary tag.
 tag := $(tag)
@@ -132,24 +149,30 @@ endif
 #  multiple platforms.  Thus we need to figure out the entire tag set
 #  up front.
 
+# Keeping this model for single-platform, and we will reassemble the
+# containers later with docker manifest.  Maybe we can push one at a time
+# without needing large containers, at least for now?
+
 img := $(shell echo $(image) | cut -d ',' -f 1)
 more := $(shell echo $(image) | cut -d ',' -f 2- | tr ',' ' ')
 
-tagset := --tag $(img):$(version)
+tagset := --tag $(img)\:$(version)-$(platform)
 # All the plain version tags
-moretags := $(foreach m,$(more), --tag $(m):$(version))
-$(info moretags is $(moretags))
+moretags := $(foreach m,$(more), --tag $(m)\:$(version)-$(platform))
+
 tagset := $(tagset)$(moretags)
 ifneq ($(ltype),)
-    ltag := --tag $(img):$(ltype)
-    moretags := $(foreach m,$(more), --tag $(m):$(ltype))
+    ltag := --tag $(img)\:$(ltype)-$(platform)
+    moretags := $(foreach m,$(more), --tag $(m)\:$(ltype)-$(platform))
     tagset := "$(tagset) $(ltag)$(moretags)"
 endif
 ifneq ($(latest),)
-    ltag := --tag $(img):$(latest)
-    moretags := $(foreach m,$(more), --tag $(m):$(latest)
+    ltag := --tag $(img)\:$(latest)
+    moretags := $(foreach m,$(more), --tag $(m)\:$(latest)
     tagset := $(tagset) $(ltag)$(moretags)
 endif
+
+$(info tagset is $(tagset))
 
 # There are no targets in the classic sense, and there is a strict linear
 #  dependency from building the dockerfile to the image to pushing it.
@@ -166,34 +189,37 @@ all: push
 #  to push to whatever the target repository or repositories (specified in
 #  $(image), possibly as a comma-separated list of targets) may be.
 push:
-	($(DOCKER) builder ls | grep -q ^sciplat-lab) || \
-	    $(DOCKER) buildx create --name sciplat-lab \
+	($(DOCKER) builder ls | grep -q ^sciplat-lab-$(platform)) || \
+	    $(DOCKER) buildx create --name sciplat-lab-$(platform) \
 	    --driver docker-container \
-	    --platform linux/amd64,linux/arm64
-	$(DOCKER) buildx build --platform=linux/amd64,linux/arm64 \
-          --builder sciplat-lab \
+	    --platform linux/$(platform)
+	$(DOCKER) buildx build --platform=linux/$(platform) \
+	  --builder sciplat-lab-$(platform) \
 	  --progress plain \
-          --build-arg input=$(input) \
-          --build-arg image=$(img) --build-arg tag=$(tag) \
+	  --build-arg input=$(input) \
+	  --build-arg image=$(img) --build-arg tag=$(tag) \
+	  --cache-from type=gha --cache-to type=gha,mode=max \
 	  --output=registry \
-          $(tagset) .
+	  $(tagset) .
+
 
 # I keep getting this wrong, so make it work either way.
 build: image
 
 # Exactly the same as push, except that we do not in fact push.
 image:
-	($(DOCKER) builder ls | grep -q ^sciplat-lab) || \
-	    $(DOCKER) buildx create --name sciplat-lab \
+	($(DOCKER) builder ls | grep -q ^sciplat-lab-$(platform)) || \
+	    $(DOCKER) buildx create --name sciplat-lab-$(platform) \
 	    --driver docker-container \
-	    --platform linux/amd64,linux/arm64
-	$(DOCKER) buildx build --platform=linux/amd64,linux/arm64 \
-          --builder sciplat-lab \
+	    --platform linux/$(platform)
+	$(DOCKER) buildx build --platform=linux/$(platform) \
+	  --builder sciplat-lab-$(platform) \
 	  --progress plain \
-          --build-arg input=$(input) \
-          --build-arg image=$(img) --build-arg tag=$(tag) \
+	  --build-arg input=$(input) \
+	  --build-arg image=$(img) --build-arg tag=$(tag) \
+	  --cache-from type=gha --cache-to type=gha,mode=max \
 	  --output=type=image,push=false \
-          $(tagset) .
+	  $(tagset) .
 
 retag:
 	if [ -z "$(supplementary)" ]; then \
