@@ -21,9 +21,13 @@ on:
         required: false
         default: 'true'
       input:
-        description: 'input image; you probably should change at most the tag'
+        description: 'input image; you probably should change at most the tag; backslash-escape the colon'
         required: false
-        default: 'ghcr.io/lsst-sqre/nublado-jupyterlab-base:latest'
+        default: 'ghcr.io/lsst-sqre/nublado-jupyterlab-base\:latest'
+      platform:
+        description: 'platform; one of "amd64" (default) or "arm64".'
+        required: false
+        default: 'amd64'
 
 # We need actions/write if we want to do a GH App, and we need
 # packages/write to push to ghcr.io with GITHUB_TOKEN
@@ -36,7 +40,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    timeout-minutes: 300
     steps:
     - name: checkout
       uses: actions/checkout@v4
@@ -48,6 +52,7 @@ jobs:
         echo "image=${{ github.event.inputs.image }}" >> $GITHUB_ENV
         echo "push=${{ github.event.inputs.push }}" >> $GITHUB_ENV
         echo "input=${{ github.event.inputs.input }}" >> $GITHUB_ENV
+        echo "platform=${{ github.event.inputs.platform }}" >> $GITHUB_ENV
 
     - name: parse_env
       shell: bash
