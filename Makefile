@@ -74,6 +74,7 @@ endif
 #  image-writing stage on GitHub Actions.  So we're going to work around it,
 #  at least until legacy build support is removed.
 DOCKER := docker
+export DOCKER_BUILDKIT=1
 
 # Force to simply-expanded variables, for when we add the supplementary tag.
 tag := $(tag)
@@ -126,6 +127,30 @@ else ifeq ($(tag_type),d)
     ltype := latest_daily
 endif
 
+# If we are going to build multiplatform containers, we have to build
+#  them #  with all tags enabled, because you can't use --load with
+#  multiple platforms.  Thus we need to figure out the entire tag set
+#  up front.
+
+img := $(shell echo $(image) | cut -d ',' -f 1)
+more := $(shell echo $(image) | cut -d ',' -f 2- | tr ',' ' ')
+
+tagset := --tag $(img):$(version)
+# All the plain version tags
+moretags := $(foreach m,$(more), --tag $(m):$(version))
+$(info moretags is $(moretags))
+tagset := $(tagset)$(moretags)
+ifneq ($(ltype),)
+    ltag := --tag $(img):$(ltype)
+    moretags := $(foreach m,$(more), --tag $(m):$(ltype))
+    tagset := "$(tagset) $(ltag)$(moretags)"
+endif
+ifneq ($(latest),)
+    ltag := --tag $(img):$(latest)
+    moretags := $(foreach m,$(more), --tag $(m):$(latest)
+    tagset := $(tagset) $(ltag)$(moretags)
+endif
+
 # There are no targets in the classic sense, and there is a strict linear
 #  dependency from building the dockerfile to the image to pushing it.
 
@@ -140,43 +165,35 @@ all: push
 # push assumes that the building user already has docker credentials
 #  to push to whatever the target repository or repositories (specified in
 #  $(image), possibly as a comma-separated list of targets) may be.
-push: image
-	img=$$(echo $(image) | cut -d ',' -f 1) && \
-	more=$$(echo $(image) | cut -d ',' -f 2- | tr ',' ' ') && \
-	$(DOCKER) push $${img}:$(version) && \
-	for m in $${more}; do \
-	    $(DOCKER) tag $${img}:$(version) $${m}:$(version) ; \
-	    $(DOCKER) push $${m}:$(version) ; \
-	done && \
-	if [ -n "$(ltype)" ]; then \
-	    $(DOCKER) tag $${img}:$(version) $${img}:$(ltype) ; \
-	    $(DOCKER) push $${img}:$(ltype) ; \
-	    for m in $${more}; do \
-	        $(DOCKER) tag $${img}:$(ltype) $${m}:$(ltype) ; \
-	        $(DOCKER) push $${m}:$(ltype) ; \
-	    done ; \
-	fi && \
-	if [ -n "$(latest)" ]; then \
-	    $(DOCKER) tag $${img}:$(version) $${img}:$(latest) ; \
-	    $(DOCKER) push $${img}:$(latest) ; \
-	    for m in $${more}; do \
-	        $(DOCKER) tag $${img}:$(latest) $${m}:$(latest) ; \
-	        $(DOCKER) push $${m}:$(latest) ; \
-	    done ; \
-	fi
+push:
+	($(DOCKER) builder ls | grep -q ^sciplat-lab) || \
+	    $(DOCKER) buildx create --name sciplat-lab \
+	    --driver docker-container \
+	    --platform linux/amd64,linux/arm64
+	$(DOCKER) buildx build --platform=linux/amd64,linux/arm64 \
+          --builder sciplat-lab \
+	  --progress plain \
+          --build-arg input=$(input) \
+          --build-arg image=$(img) --build-arg tag=$(tag) \
+	  --output=registry \
+          $(tagset) .
 
 # I keep getting this wrong, so make it work either way.
 build: image
 
+# Exactly the same as push, except that we do not in fact push.
 image:
-	img=$$(echo $(image) | cut -d ',' -f 1) && \
-	more=$$(echo $(image) | cut -d ',' -f 2- | tr ',' ' ') && \
-	$(DOCKER) build ${platform} --build-arg input=$(input) \
-          --build-arg image=$${img} --build-arg tag=$(tag) \
-          -t $${img}:$(version) . && \
-	for m in $${more}; do \
-	    $(DOCKER) tag $${img}:$(version) $${m}:$(version) ; \
-	done
+	($(DOCKER) builder ls | grep -q ^sciplat-lab) || \
+	    $(DOCKER) buildx create --name sciplat-lab \
+	    --driver docker-container \
+	    --platform linux/amd64,linux/arm64
+	$(DOCKER) buildx build --platform=linux/amd64,linux/arm64 \
+          --builder sciplat-lab \
+	  --progress plain \
+          --build-arg input=$(input) \
+          --build-arg image=$(img) --build-arg tag=$(tag) \
+	  --output=type=image,push=false \
+          $(tagset) .
 
 retag:
 	if [ -z "$(supplementary)" ]; then \
