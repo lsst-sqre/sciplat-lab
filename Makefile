@@ -188,6 +188,9 @@ all: push
 # push assumes that the building user already has docker credentials
 #  to push to whatever the target repository or repositories (specified in
 #  $(image), possibly as a comma-separated list of targets) may be.
+#
+# 	  --cache-from type=gha --cache-to type=gha,mode=max \
+# will not work--cache is too large.
 push:
 	($(DOCKER) builder ls | grep -q ^sciplat-lab-$(platform)) || \
 	    $(DOCKER) buildx create --name sciplat-lab-$(platform) \
@@ -198,7 +201,6 @@ push:
 	  --progress plain \
 	  --build-arg input=$(input) \
 	  --build-arg image=$(img) --build-arg tag=$(tag) \
-	  --cache-from type=gha --cache-to type=gha,mode=max \
 	  --output=registry \
 	  $(tagset) .
 
@@ -217,7 +219,6 @@ image:
 	  --progress plain \
 	  --build-arg input=$(input) \
 	  --build-arg image=$(img) --build-arg tag=$(tag) \
-	  --cache-from type=gha --cache-to type=gha,mode=max \
 	  --output=type=image,push=false \
 	  $(tagset) .
 
