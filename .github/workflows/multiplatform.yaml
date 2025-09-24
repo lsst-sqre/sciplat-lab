@@ -160,12 +160,6 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
 
-    - name: setup_buildx
-      uses: docker/setup-buildx-action@v3
-      with:
-        name: sciplat-lab-${{ matrix.platform.arch }}
-        platforms: linux/${{ matrix.platform.arch }}
-
     - name: calculate_tags
       shell: bash
       run: |
@@ -178,18 +172,6 @@ jobs:
       shell: bash
       run: |
         /bin/true
-
-    - name: build
-      uses: docker/build-push-action@v6
-      with:
-        builder: sciplat-lab-${{ github.event.inputs.platform }}
-        platforms: linux/${{ steps.calculate_tags.outputs.platform }}
-        tags: ${{ steps.calculate_tags.outputs.tags }}
-        push: true
-        build-args: |
-          input=${{ env.input }}
-          tag=${{ env.tag }}
-          version=${{ env.version }}
 
   unify_manifest:
     env:
@@ -217,11 +199,3 @@ jobs:
         shell: bash
         run: |
           /bin/true
-
-
-      - name: make_manifest
-        uses: Noelware/docker-manifest-action@v1
-        with:
-          inputs: ${{ steps.make_total_tagset.outputs.in_tagset }}
-          tags: ${{ steps.make_total_tagset.outputs.out_tagset }}
-          push: true
