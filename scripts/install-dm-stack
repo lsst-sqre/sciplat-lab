@@ -28,7 +28,7 @@ for prod in $EUPS_PRODUCTS; do
 done
 
 for product in lsst_distrib lsst_sitcom; do
-    eups distrib install -vvv -t $TAG $product
+    eups distrib install -t $TAG $product
 done
 curl -sSL $sbt | python
 setup lsst_distrib

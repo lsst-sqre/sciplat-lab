@@ -156,8 +156,33 @@ jobs:
         username: ${{ env.google_username }}
         password: ${{ env.google_password }}
 
-    - name: build
+    - name: setup_buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        name: sciplat-lab-${{ github.event.inputs.platform }}
+        platforms: linux/${{ github.event.inputs.platform }}
+
+    - name: calculate_tags
       shell: bash
       run: |
-            make ${{ env.make_args }} ${{ env.target }}
+        tags=$( scripts/calculate-tags )
+        version=$( echo tags | cut -d ':' -f 2 | cut -d ',' -f 1 )
+        echo "tags=${tags}" >> ${GITHUB_ENV}
+        echo "version=${version}" >> ${GITHUB_ENV}
 
+    - name: show_environment
+      shell: bash
+      run: |
+        /bin/true
+
+    - name: build
+      uses: docker/build-push-action@v6
+      with:
+        builder: sciplat-lab-${{ github.event.inputs.platform }}
+        platforms: linux/${{ github.event.inputs.platform }}
+        tags: ${{ env.tags }}
+        push: true
+        build-args: |
+          input=${{ env.input }}
+          tag=${{ env.tag }}
+          version=${{ env.version }}
