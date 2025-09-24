@@ -1,4 +1,4 @@
-name: Manually triggered build of sciplat-lab container
+name: Manually triggered build of multiplatform sciplat-lab container
 
 on:
   workflow_dispatch:
@@ -14,16 +14,11 @@ on:
       image:
         description: 'fully-qualified URI for output Docker image'
         required: false
-        default: 'us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab,docker.io/lsstsqre/sciplat-lab'
-        # someday we will want to remove Docker Hub.
-      push:
-        description: 'push resulting image; make empty or set to a YAML-false string to build but not push'
-        required: false
-        default: 'true'
+        default: 'us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab'
       input:
         description: 'input image; you probably should change at most the tag'
         required: false
-        default: 'ghcr.io/lsst-sqre/nublado-jupyterlab-base:latest'
+        default: 'ghcr.io/lsst-sqre/nublado-jupyterlab-base:tickets-DM-52583'
 
 # We need actions/write if we want to do a GH App, and we need
 # packages/write to push to ghcr.io with GITHUB_TOKEN
@@ -34,40 +29,34 @@ permissions:
   statuses: read
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.calculate_version.outputs.version }}
+    env:
+      tag: ${{ github.event.inputs.tag }}
+      supplementary: ${{ github.event.inputs.supplementary }}
+      image: ${{ github.event.inputs.image }}
+      input: ${{ github.event.inputs.input }}
+
     steps:
     - name: checkout
       uses: actions/checkout@v4
-    - name: import_inputs
+
+    - name: calculate_version
       shell: bash
       run: |
-        echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
-        echo "supplementary=${{ github.event.inputs.supplementary }}" >> $GITHUB_ENV
-        echo "image=${{ github.event.inputs.image }}" >> $GITHUB_ENV
-        echo "push=${{ github.event.inputs.push }}" >> $GITHUB_ENV
-        echo "input=${{ github.event.inputs.input }}" >> $GITHUB_ENV
+        version=${tag}
+        if [ $(echo ${version} | cut -c 1) == "v" ]; then
+            version="r$(echo ${version} | cut -c 2-)"
+        fi
+        echo "version=${version}" >> ${GITHUB_OUTPUT}
+        echo "version=${version}" >> ${GITHUB_ENV}
 
     - name: parse_env
       shell: bash
       run: |
-         case ${{ env.push }} in
-             ''|n|N|no|No|NO|false|False|FALSE|off|Off|OFF)
-                 echo "target=image" >> $GITHUB_ENV
-                 ;;
-             *)
-                 echo "target=push" >> $GITHUB_ENV
-                 ;;
-         esac
-         make_args="tag=${{ env.tag }}"
-         if [ -n "${{ env.supplementary }}" ]; then
-             make_args="${make_args} supplementary=${{ env.supplementary }}"
-         fi
-         if [ -n "${{ env.image }}" ]; then
-             make_args="${make_args} image=${{ env.image }}"
-         fi
-         echo "make_args=${make_args}" >> $GITHUB_ENV
          # env.image may be a comma-separated list of images; we are
          # thus creating a set of registry-specific variables from the
          # images in the list
@@ -115,12 +104,10 @@ jobs:
              echo "${d_tag}password=${d_password}" >> $GITHUB_ENV
          done
 
-    # Only bother logging in to a given site if we're going to push the
-    # container and we have credentials
+    # Only bother logging in to a given site if we have credentials
     - name: Log in to Docker Hub repository
       if: >-
-        ((env.target == 'push') &&
-         (env.docker_registry != '') &&
+        ((env.docker_registry != '') &&
          (env.docker_username != '') &&
          (env.docker_password != ''))
       uses: docker/login-action@v3
@@ -128,10 +115,10 @@ jobs:
         registry: ${{ env.docker_registry }}
         username: ${{ env.docker_username }}
         password: ${{ env.docker_password }}
+
     - name: Log in to GitHub Container Registry
       if: >-
-        ((env.target == 'push') &&
-         (env.github_registry != '') &&
+        ((env.github_registry != '') &&
          (env.github_username != '') &&
          (env.github_password != ''))
       uses: docker/login-action@v3
@@ -139,10 +126,10 @@ jobs:
         registry: ${{ env.github_registry }}
         username: ${{ env.github_username }}
         password: ${{ env.github_password }}
+
     - name: Log in to Google Artifact Registry
       if: >-
-        ((env.target == 'push') &&
-         (env.google_registry != '') &&
+        ((env.google_registry != '') &&
          (env.google_username != '') &&
          (env.google_password != ''))
       uses: docker/login-action@v3
@@ -151,7 +138,90 @@ jobs:
         username: ${{ env.google_username }}
         password: ${{ env.google_password }}
 
-    - name: build
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    outputs:
+      version: ${{ needs.setup.outputs.version }}
+    env:
+      version: ${{ needs.setup.outputs.version }}
+      tag: ${{ github.event.inputs.tag }}
+      image: ${{ github.event.inputs.image }}
+      input: ${{ github.event.inputs.input }}
+      supplementary: ${{ github.event.inputs.supplementary }}
+
+    strategy:
+      matrix:
+        platform:
+          - arch: "amd64"
+          - arch: "arm64"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+
+    - name: setup_buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        name: sciplat-lab-${{ matrix.platform.arch }}
+        platforms: linux/${{ matrix.platform.arch }}
+
+    - name: calculate_tags
       shell: bash
       run: |
-            make ${{ env.make_args }} ${{ env.target }}
+        export platform=${{ matrix.platform.arch }}
+        tags=$( scripts/calculate-tags )
+        echo "tags=${tags}" >> ${GITHUB_OUTPUT}
+        echo "platform=${platform}" >> ${GITHUB_OUTPUT}
+
+    - name: dump_env
+      shell: bash
+      run: |
+        /bin/true
+
+    - name: build
+      uses: docker/build-push-action@v6
+      with:
+        builder: sciplat-lab-${{ github.event.inputs.platform }}
+        platforms: linux/${{ steps.calculate_tags.outputs.platform }}
+        tags: ${{ steps.calculate_tags.outputs.tags }}
+        push: true
+        build-args: |
+          input=${{ env.input }}
+          tag=${{ env.tag }}
+          version=${{ env.version }}
+
+  unify_manifest:
+    env:
+      version: ${{ needs.build.outputs.version }}
+      tag: ${{ github.event.inputs.tag }}
+      image: ${{ github.event.inputs.image }}
+      input: ${{ github.event.inputs.input }}
+      supplementary: ${{ github.event.inputs.supplementary }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: make_total_tagset
+        shell: bash
+        run: |
+          t1=$( platform=amd64 scripts/calculate-tags )
+          t2=$( platform=arm64 scripts/calculate-tags )
+          echo "in_tagset=${t1},${t2}" >> ${GITHUB_OUTPUT}
+          echo "out_tagset=$(echo ${t1} | sed -e 's/-amd64$//g' )" >> ${GITHUB_OUTPUT}
+
+      - name: dump_env
+        shell: bash
+        run: |
+          /bin/true
+
+
+      - name: make_manifest
+        uses: Noelware/docker-manifest-action@v1
+        with:
+          inputs: ${{ steps.make_total_tagset.outputs.in_tagset }}
+          tags: ${{ steps.make_total_tagset.outputs.out_tagset }}
+          push: true
