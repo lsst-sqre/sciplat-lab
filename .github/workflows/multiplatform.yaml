@@ -29,7 +29,7 @@ permissions:
   statuses: read
 
 jobs:
-  setup:
+  multiplatform_setup:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
@@ -139,13 +139,13 @@ jobs:
         password: ${{ env.google_password }}
 
   build_containers:
-    needs: setup
+    needs: multiplatform_setup
     runs-on: ubuntu-latest
     timeout-minutes: 300
     outputs:
-      version: ${{ needs.setup.outputs.version }}
+      version: ${{ needs.multiplatform_setup.outputs.version }}
     env:
-      version: ${{ needs.setup.outputs.version }}
+      version: ${{ needs.multiplatform_setup.outputs.version }}
       tag: ${{ github.event.inputs.tag }}
       image: ${{ github.event.inputs.image }}
       input: ${{ github.event.inputs.input }}
