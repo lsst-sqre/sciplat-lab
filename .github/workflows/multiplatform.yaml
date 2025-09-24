@@ -41,7 +41,7 @@ jobs:
       input: ${{ github.event.inputs.input }}
 
     steps:
-    - name: checkout
+    - name: checkout_setup
       uses: actions/checkout@v4
 
     - name: calculate_version
@@ -138,7 +138,7 @@ jobs:
         username: ${{ env.google_username }}
         password: ${{ env.google_password }}
 
-  build:
+  build_containers:
     needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 300
@@ -157,7 +157,7 @@ jobs:
           - arch: "amd64"
           - arch: "arm64"
     steps:
-    - name: checkout
+    - name: checkout_setup
       uses: actions/checkout@v4
 
     - name: setup_buildx
@@ -179,7 +179,7 @@ jobs:
       run: |
         /bin/true
 
-    - name: build
+    - name: build_platform_container
       uses: docker/build-push-action@v6
       with:
         builder: sciplat-lab-${{ github.event.inputs.platform }}
@@ -193,7 +193,7 @@ jobs:
 
   unify_manifest:
     env:
-      version: ${{ needs.build.outputs.version }}
+      version: ${{ needs.build_container.outputs.version }}
       tag: ${{ github.event.inputs.tag }}
       image: ${{ github.event.inputs.image }}
       input: ${{ github.event.inputs.input }}
@@ -202,7 +202,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: checkout
+      - name: checkout_unify_manifest
         uses: actions/checkout@v4
 
       - name: make_total_tagset
