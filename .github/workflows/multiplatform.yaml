@@ -192,14 +192,14 @@ jobs:
           version=${{ env.version }}
 
   unify_manifest:
+    needs: build_containers
+    runs-on: ubuntu-latest
     env:
-      version: ${{ needs.build_container.outputs.version }}
+      version: ${{ needs.build_containers.outputs.version }}
       tag: ${{ github.event.inputs.tag }}
       image: ${{ github.event.inputs.image }}
       input: ${{ github.event.inputs.input }}
       supplementary: ${{ github.event.inputs.supplementary }}
-    needs: build
-    runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - name: checkout_unify_manifest
