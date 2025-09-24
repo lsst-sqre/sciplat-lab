@@ -19,10 +19,12 @@ mkdir -p $stackdir
 cd $stackdir
 curl -OL https://ls.st/lsstinstall
 chmod u+x lsstinstall
-./lsstinstall -T $TAG
+# Alas, if we don't run it with bash, some of the activate scripts
+# (rust and openmpi) fail, because they assume bash, not POSIX shell.
+bash ./lsstinstall -T $TAG
 source $stackdir/loadLSST.bash
 for prod in $EUPS_PRODUCTS; do
-    eups distrib install --no-server-tags -vvv "$prod" -t "$EUPS_TAG"
+    eups distrib install --no-server-tags "$prod" -t "$EUPS_TAG"
 done
 find ${stackdir} -exec strip --strip-unneeded --preserve-dates {} + \
      > /dev/null 2>&1 || true
