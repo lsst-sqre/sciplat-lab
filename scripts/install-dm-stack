@@ -33,7 +33,6 @@ done
 curl -sSL $sbt | python
 setup lsst_distrib
 
-# Let's hope there are no spaces in filenames under $EUPS_PATH
 echo "---begin postinstall cleanup---"
 echo "Pre-cleanup ${stackdir} size:"
 du -sm ${stackdir}
