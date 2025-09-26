@@ -26,15 +26,6 @@ source $stackdir/loadLSST.bash
 for prod in $EUPS_PRODUCTS; do
     eups distrib install --no-server-tags "$prod" -t "$EUPS_TAG"
 done
-find ${stackdir} -exec strip --strip-unneeded --preserve-dates {} + \
-     > /dev/null 2>&1 || true
-find ${stackdir} -maxdepth 5 -name tests -type d -exec rm -rf {} + \
-       > /dev/null 2>&1 || true
-find ${stackdir} -maxdepth 6 \
-       \( -path "*doc/html" -o -path "*doc/xml" \) -type d -exec rm -rf {} + \
-       > /dev/null 2>&1 || true
-find ${stackdir} -maxdepth 5 -name src -type d -exec rm -rf {} + \
-       > /dev/null 2>&1 || true
 
 for product in lsst_distrib lsst_sitcom; do
     eups distrib install -t $TAG $product
@@ -42,4 +33,25 @@ done
 curl -sSL $sbt | python
 setup lsst_distrib
 
+echo "---begin postinstall cleanup---"
+echo "Pre-cleanup ${stackdir} size:"
+du -sm ${stackdir}
+for dirn in tests src .git; do
+    find ${EUPS_PATH} -name ${dirn} -type d -print0 | xargs -0 rm -rf
+done
+find ${EUPS_PATH} \
+     \( -path "*doc/html" -o -path "*doc/xml" \) \
+     -type d -print0 | xargs -0 rm -rf
+echo "Pre-strip ${stackdir} size"
+du -sm
+# Do this the hard way
+find ${EUPS_PATH} -type f -name "*.so" -print0 | \
+    xargs -0 strip -p --strip-unneeded || /bin/true
+exes=find ${EUPS_PATH} -type f -executable -print0 | \
+    xargs -0 strip -p --strip-unneeded || /bin/true
+echo "Post-cleanup ${stackdir} size:"
+du -sm ${stackdir}
 conda clean -a -f -y  # Not clear that -f is safe.
+echo "Post-conda-clean ${stackdir} size:"
+du -sm ${stackdir}
+echo "---end postinstall cleanup---"
