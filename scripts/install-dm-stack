@@ -27,13 +27,18 @@ for prod in $EUPS_PRODUCTS; do
     eups distrib install --no-server-tags "$prod" -t "$EUPS_TAG"
 done
 
+for product in lsst_distrib lsst_sitcom; do
+    eups distrib install -t $TAG $product
+done
+curl -sSL $sbt | python
+setup lsst_distrib
+
 # Let's hope there are no spaces in filenames under $EUPS_PATH
 echo "---cleanup---"
 echo "Pre-cleanup ${stackdir} size:"
 du -sm ${stackdir}
-echo "ALL THE THINGS"
-find ${EUPS_PATH} -print
-echo "DONE WITH ALL THE THINGS"
+echo "SOME OF THE THINGS"
+ls ${EUPS_PATH}
 for dirn in tests src .git; do
     victims=$(find ${EUPS_PATH} -name ${dirn} -type d -print)
     echo "'${dirn}' dirs to delete:"
@@ -63,12 +68,7 @@ for e in ${exes}; do
 done
 echo "Post-cleanup ${stackdir} size:"
 du -sm ${stackdir}
-echo "---end cleanup---"
-
-for product in lsst_distrib lsst_sitcom; do
-    eups distrib install -t $TAG $product
-done
-curl -sSL $sbt | python
-setup lsst_distrib
-
 conda clean -a -f -y  # Not clear that -f is safe.
+echo "Post-conda-clean ${stackdir} size:"
+du -sm ${stackdir}
+echo "---end cleanup---"
