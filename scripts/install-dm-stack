@@ -34,41 +34,25 @@ curl -sSL $sbt | python
 setup lsst_distrib
 
 # Let's hope there are no spaces in filenames under $EUPS_PATH
-echo "---cleanup---"
+echo "---begin postinstall cleanup---"
 echo "Pre-cleanup ${stackdir} size:"
 du -sm ${stackdir}
-echo "SOME OF THE THINGS"
-ls ${EUPS_PATH}
 for dirn in tests src .git; do
-    victims=$(find ${EUPS_PATH} -name ${dirn} -type d -print)
-    echo "'${dirn}' dirs to delete:"
-    echo "${victims}"
-    if [ -n "${victims}" ]; then
-	rm -rf ${victims}
-    fi
+    find ${EUPS_PATH} -name ${dirn} -type d -print0 | xargs -0 rm -rf
 done
-victims=$(find ${EUPS_PATH} \
-	       \( -path "*doc/html" -o -path "*doc/xml" \) \
-	  -type d -print)
-echo "doc dirs to delete:"
-echo "${victims}"
-rm -rf ${victims}
+find ${EUPS_PATH} \
+     \( -path "*doc/html" -o -path "*doc/xml" \) \
+     -type d -print0 | xargs -0 rm -rf
 echo "Pre-strip ${stackdir} size"
 du -sm
 # Do this the hard way
-libs=$(find ${EUPS_PATH} -type f -name "*.so" -print)
-echo "Libraries to strip: ${libs}"
-for l in ${libs}; do
-    strip -p --strip-unneeded "${l}" || echo "Strip failed"
-done
-exes=$(find ${EUPS_PATH} -type f -executable -print)
-echo "Executables to strip: ${exes}"
-for e in ${exes}; do
-    strip -p --strip-unneeded "${e}" || echo "Strip failed"
-done
+find ${EUPS_PATH} -type f -name "*.so" -print0 | \
+    xargs -0 strip -p --strip-unneeded || /bin/true
+exes=find ${EUPS_PATH} -type f -executable -print0 | \
+    xargs -0 strip -p --strip-unneeded || /bin/true
 echo "Post-cleanup ${stackdir} size:"
 du -sm ${stackdir}
 conda clean -a -f -y  # Not clear that -f is safe.
 echo "Post-conda-clean ${stackdir} size:"
 du -sm ${stackdir}
-echo "---end cleanup---"
+echo "---end postinstall cleanup---"
