@@ -208,6 +208,13 @@ jobs:
            # images in the list
            split_images=$(echo ${{ env.image }} | tr ',' ' ')
            for img in ${split_images}; do
+               # Count slashes in img to canonicalize it.
+               slashcount=$(echo ${img} | awk -F/ '{print NF-1}')
+               if [ "${slashcount}" -eq 0 ]; then
+                   img="docker.io/library/${img}"
+               elif [ "${slashcount}" -eq 1 ]; then
+                   img="docker.io/${img}"
+               fi  # More than 1, we leave untouched.
                image_host=$(echo ${img} | cut -d '/' -f 1)
                # Check for implicit Docker Hub
                case ${image_host} in
