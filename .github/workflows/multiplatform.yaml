@@ -1,0 +1,311 @@
+name: Manually triggered build of multiplatform sciplat-lab container
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'EUPS tag of input DM Pipelines Stack container'
+        required: true
+        default: ''
+      supplementary:
+        description: 'Supplementary tag for experimental builds; yields output tag exp_tag_supplementary'
+        required: false
+        default: ''
+      image:
+        description: 'fully-qualified URI for output Docker image'
+        required: false
+        default: 'us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab'
+      input:
+        description: 'input image; you probably should change at most the tag'
+        required: false
+        default: 'ghcr.io/lsst-sqre/nublado-jupyterlab-base:tickets-DM-52583'
+
+# We need actions/write if we want to do a GH App, and we need
+# packages/write to push to ghcr.io with GITHUB_TOKEN
+permissions:
+  actions: write
+  contents: read
+  packages: write
+  statuses: read
+
+jobs:
+  determine_version:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.calculate_version.outputs.version }}
+    env:
+      tag: ${{ github.event.inputs.tag }}
+      supplementary: ${{ github.event.inputs.supplementary }}
+      image: ${{ github.event.inputs.image }}
+      input: ${{ github.event.inputs.input }}
+
+    steps:
+      - name: checkout_setup
+        uses: actions/checkout@v4
+
+      - name: calculate_version
+        id: calculate_version
+        shell: bash
+        run: |
+          . scripts/helper-functions.sh
+          version=$( tag_to_version )
+          echo "version=${version}" >> ${GITHUB_OUTPUT}
+
+  build_containers:
+    needs: determine_version
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    outputs:
+      version: ${{ needs.determine_version.outputs.version }}
+    env:
+      version: ${{ needs.determine_version.outputs.version }}
+      tag: ${{ github.event.inputs.tag }}
+      image: ${{ github.event.inputs.image }}
+      input: ${{ github.event.inputs.input }}
+      supplementary: ${{ github.event.inputs.supplementary }}
+
+    strategy:
+      matrix:
+        platform:
+          - arch: "amd64"
+          - arch: "arm64"
+    steps:
+      - name: checkout_setup
+        uses: actions/checkout@v4
+
+      - name: setup_buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          name: sciplat-lab-${{ matrix.platform.arch }}
+          platforms: linux/${{ matrix.platform.arch }}
+
+      - name: calculate_tags
+        id: calculate_tags
+        env:
+          platform: ${{ matrix.platform.arch }}
+        shell: bash
+        run: |
+          . scripts/helper-functions.sh
+          tags=$( calculate_tags )
+          echo "tags=${tags}" >> ${GITHUB_OUTPUT}
+
+      - name: parse_env
+        shell: bash
+        run: |
+           # env.image may be a comma-separated list of images; we are
+           # thus creating a set of registry-specific variables from the
+           # images in the list
+           split_images=$(echo ${{ env.image }} | tr ',' ' ')
+           for img in ${split_images}; do
+               image_host=$(echo ${img} | cut -d '/' -f 1)
+               # Check for implicit Docker Hub
+               case ${image_host} in
+                   *.*)
+                       ;;
+                   *)
+                       image_host="docker.io"
+                       ;;
+               esac
+               case ${image_host} in
+                   docker.com | docker.io | *.docker.com | *.docker.io)
+                       d_tag="docker_"
+                       d_registry="docker.io"
+                       d_username="${{ secrets.DOCKER_USERNAME }}"
+                       d_password="${{ secrets.DOCKER_TOKEN }}"
+                       ;;
+                   ghcr.io | *.ghcr.io)
+                       d_tag="github_"
+                       d_registry="ghcr.io"
+                       # using secrets.GITHUB_TOKEN fails, saying it doesn't
+                       # have write.package, which seems weird.
+                       d_username="token"
+                       d_password="${{ secrets.GHCR_PUSH_TOKEN}}"
+                       ;;
+                   *-docker.pkg.dev)
+                      d_tag="google_"
+                      d_registry="${image_host}"
+                      d_username="_json_key_base64"
+                      d_password="${{ secrets.GAR_PUSH_TOKEN }}"
+                      ;;
+                   *)
+                       d_tag=""
+                       d_registry="${image_host}"
+                       d_username=""
+                       d_password=""
+                       ;;
+               esac
+               echo "${d_tag}registry=${d_registry}" >> $GITHUB_ENV
+               echo "${d_tag}username=${d_username}" >> $GITHUB_ENV
+               echo "${d_tag}password=${d_password}" >> $GITHUB_ENV
+           done
+
+      # Only bother logging in to a given site if we have credentials
+      - name: Log in to Docker Hub repository
+        if: >-
+          ((env.docker_registry != '') &&
+           (env.docker_username != '') &&
+           (env.docker_password != ''))
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.docker_registry }}
+          username: ${{ env.docker_username }}
+          password: ${{ env.docker_password }}
+
+      - name: Log in to GitHub Container Registry
+        if: >-
+          ((env.github_registry != '') &&
+           (env.github_username != '') &&
+           (env.github_password != ''))
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.github_registry }}
+          username: ${{ env.github_username }}
+          password: ${{ env.github_password }}
+
+      - name: Log in to Google Artifact Registry
+        if: >-
+          ((env.google_registry != '') &&
+           (env.google_username != '') &&
+           (env.google_password != ''))
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.google_registry }}
+          username: ${{ env.google_username }}
+          password: ${{ env.google_password }}
+
+      - name: build_platform_container
+        uses: docker/build-push-action@v6
+        with:
+          builder: sciplat-lab-${{ matrix.platform.arch }}
+          platforms: linux/${{ matrix.platform.arch }}
+          tags: ${{ steps.calculate_tags.outputs.tags }}
+          push: true
+          build-args: |
+            input=${{ env.input }}
+            tag=${{ env.tag }}
+            version=${{ env.version }}
+
+  unify_manifest:
+    needs: build_containers
+    runs-on: ubuntu-latest
+    env:
+      version: ${{ needs.build_containers.outputs.version }}
+      tag: ${{ github.event.inputs.tag }}
+      image: ${{ github.event.inputs.image }}
+      input: ${{ github.event.inputs.input }}
+      supplementary: ${{ github.event.inputs.supplementary }}
+    timeout-minutes: 30
+    steps:
+      - name: checkout_unify_manifest
+        uses: actions/checkout@v4
+
+      - name: parse_env
+        shell: bash
+        run: |
+           # env.image may be a comma-separated list of images; we are
+           # thus creating a set of registry-specific variables from the
+           # images in the list
+           split_images=$(echo ${{ env.image }} | tr ',' ' ')
+           for img in ${split_images}; do
+               # Count slashes in img to canonicalize it.
+               slashcount=$(echo ${img} | awk -F/ '{print NF-1}')
+               if [ "${slashcount}" -eq 0 ]; then
+                   img="docker.io/library/${img}"
+               elif [ "${slashcount}" -eq 1 ]; then
+                   img="docker.io/${img}"
+               fi  # More than 1, we leave untouched.
+               image_host=$(echo ${img} | cut -d '/' -f 1)
+               # Check for implicit Docker Hub
+               case ${image_host} in
+                   *.*)
+                       ;;
+                   *)
+                       image_host="docker.io"
+                       ;;
+               esac
+               case ${image_host} in
+                   docker.com | docker.io | *.docker.com | *.docker.io)
+                       d_tag="docker_"
+                       d_registry="docker.io"
+                       d_username="${{ secrets.DOCKER_USERNAME }}"
+                       d_password="${{ secrets.DOCKER_TOKEN }}"
+                       ;;
+                   ghcr.io | *.ghcr.io)
+                       d_tag="github_"
+                       d_registry="ghcr.io"
+                       # using secrets.GITHUB_TOKEN fails, saying it doesn't
+                       # have write.package, which seems weird.
+                       d_username="token"
+                       d_password="${{ secrets.GHCR_PUSH_TOKEN}}"
+                       ;;
+                   *-docker.pkg.dev)
+                      d_tag="google_"
+                      d_registry="${image_host}"
+                      d_username="_json_key_base64"
+                      d_password="${{ secrets.GAR_PUSH_TOKEN }}"
+                      ;;
+                   *)
+                       d_tag=""
+                       d_registry="${image_host}"
+                       d_username=""
+                       d_password=""
+                       ;;
+               esac
+               echo "${d_tag}registry=${d_registry}" >> $GITHUB_ENV
+               echo "${d_tag}username=${d_username}" >> $GITHUB_ENV
+               echo "${d_tag}password=${d_password}" >> $GITHUB_ENV
+           done
+
+      # Only bother logging in to a given site if we have credentials
+      - name: Log in to Docker Hub repository
+        if: >-
+          ((env.docker_registry != '') &&
+           (env.docker_username != '') &&
+           (env.docker_password != ''))
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.docker_registry }}
+          username: ${{ env.docker_username }}
+          password: ${{ env.docker_password }}
+
+      - name: Log in to GitHub Container Registry
+        if: >-
+          ((env.github_registry != '') &&
+           (env.github_username != '') &&
+           (env.github_password != ''))
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.github_registry }}
+          username: ${{ env.github_username }}
+          password: ${{ env.github_password }}
+
+      - name: Log in to Google Artifact Registry
+        if: >-
+          ((env.google_registry != '') &&
+           (env.google_username != '') &&
+           (env.google_password != ''))
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.google_registry }}
+          username: ${{ env.google_username }}
+          password: ${{ env.google_password }}
+
+      - name: make_total_tagset
+        id: make_total_tagset
+        shell: bash
+        run: |
+          . scripts/helper-functions.sh
+          t1=$( platform=amd64 calculate_tags )
+          t2=$( platform=arm64 calculate_tags )
+          in_tags="${t1},${t2}"
+          out_tags=$(echo ${t1} | sed -e 's/-amd64,/,/g' -e 's/-amd64$//g' )
+          echo "in_tags=${in_tags}" >> ${GITHUB_OUTPUT}
+          echo "out_tags=${out_tags}" >> ${GITHUB_OUTPUT}
+
+      - name: make_manifest
+        uses: Noelware/docker-manifest-action@v1
+        with:
+          inputs: ${{ steps.make_total_tagset.outputs.in_tags }}
+          tags: ${{ steps.make_total_tagset.outputs.out_tags }}
+          push: true
