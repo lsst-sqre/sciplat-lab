@@ -1,0 +1,48 @@
+name: Manually triggered build of multiplatform sciplat-lab container
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'EUPS tag of input DM Pipelines Stack container'
+        required: true
+        default: ''
+      supplementary:
+        description: 'Supplementary tag for experimental builds; yields output tag exp_tag_supplementary'
+        required: false
+        default: ''
+      image:
+        description: 'fully-qualified URI for output Docker image'
+        required: false
+        default: 'us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab'
+      input:
+        description: 'input image; you probably should change at most the tag'
+        required: false
+        default: 'ghcr.io/lsst-sqre/nublado-jupyterlab-base:tickets-DM-52583'
+
+# We need actions/write if we want to do a GH App, and we need
+# packages/write to push to ghcr.io with GITHUB_TOKEN
+permissions:
+  actions: write
+  contents: read
+  packages: write
+  statuses: read
+
+jobs:
+  determine_version:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.calculate_version.outputs.version }}
+    env:
+      tag: ${{ github.event.inputs.tag }}
+      supplementary: ${{ github.event.inputs.supplementary }}
+      image: ${{ github.event.inputs.image }}
+      input: ${{ github.event.inputs.input }}
+
+    steps:
+
+      - name: give_up
+        shell: bash
+        run: |
+          echo "This workflow does nothing on main."
