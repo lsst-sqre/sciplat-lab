@@ -26,7 +26,7 @@ permissions:
   statuses: read
 
 jobs:
-  build:
+  retag:
     runs-on: ubuntu-latest
     timeout-minutes: 100
     steps:
@@ -122,7 +122,7 @@ jobs:
         username: ${{ env.google_username }}
         password: ${{ env.google_password }}
 
-    - name: build
+    - name: retag
       shell: bash
       run: |
             make ${{ env.make_args }} retag
