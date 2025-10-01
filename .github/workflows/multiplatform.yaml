@@ -1,4 +1,4 @@
-name: Manually triggered build of multiplatform sciplat-lab container
+name: Manually triggered multiplatform build of sciplat-lab container
 
 on:
   workflow_dispatch:
