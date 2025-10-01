@@ -26,8 +26,10 @@ COPY profile.d/local06-showrspnotice.sh \
      /etc/profile.d/
 
 # /etc/skel
-
-RUN mkdir -p /etc/skel/notebooks
+# Coordinate dropping or lowercasing WORK and DATA with CST
+RUN for i in WORK DATA notebooks ; do \
+        mkdir -p /etc/skel/${i} ; \
+    done
 
 COPY skel/gitconfig /etc/skel/.gitconfig
 COPY skel/git-credentials /etc/skel/.git-credentials
@@ -44,7 +46,7 @@ FROM base-image AS base-stack-image
 ARG tag
 
 COPY scripts/install-dm-stack /tmp/build
-RUN ./install-dm-stack $tag
+RUN ./install-dm-stack ${tag}
 
 COPY etc/rsp_notice etc/20-logging.py \
      /usr/local/share/jupyterlab/etc/
