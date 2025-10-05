@@ -14,10 +14,6 @@ on:
         description: 'fully-qualified URI for output Docker image'
         required: false
         default: 'us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab,docker.io/lsstsqre/sciplat-lab'
-      push:
-        description: 'push resulting image; make empty or set to a YAML-false string to build but not push'
-        required: false
-        default: 'true'
       input:
         description: 'input image; you probably should change at most the tag'
         required: false
@@ -68,7 +64,6 @@ jobs:
       images: ${{ github.event.inputs.image }}
       additional-tags: ${{ needs.determine_tags.outputs.rest_tags }}
       tag: ${{ needs.determine_tags.outputs.version }}
-      push: ${{ github.event.inputs.push }}
       build-args: |
         input=${{ github.event.inputs.input }}
         tag=${{ github.event.inputs.tag }}
