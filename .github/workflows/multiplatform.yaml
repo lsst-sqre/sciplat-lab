@@ -6,7 +6,6 @@ on:
       tag:
         description: 'EUPS tag of input DM Pipelines Stack container'
         required: true
-        default: ''
       supplementary:
         description: 'Supplementary tag for experimental builds; yields output tag exp_tag_supplementary'
         required: false
@@ -15,6 +14,10 @@ on:
         description: 'fully-qualified URI for output Docker image'
         required: false
         default: 'us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab,docker.io/lsstsqre/sciplat-lab'
+      push:
+        description: 'push resulting image; make empty or set to a YAML-false string to build but not push'
+        required: false
+        default: 'true'
       input:
         description: 'input image; you probably should change at most the tag'
         required: false
@@ -29,12 +32,11 @@ permissions:
   statuses: read
 
 jobs:
-  determine_version:
+  determine_tags:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      version: ${{ steps.calculate_version.outputs.version }}
-      first_tag: ${{ steps.calculate_tags.outputs.first_tag }}
+      version: ${{ steps.calculate_tags.outputs.version }}
       rest_tags: ${{ steps.calculate_tags.outputs.rest_tags }}
       all_tags: ${{ steps.calculate_tags.outputs.all_tags }}
     env:
@@ -47,51 +49,31 @@ jobs:
       - name: checkout_setup
         uses: actions/checkout@v4
 
-      - name: calculate_version
-        id: calculate_version
-        shell: bash
-        run: |
-          . scripts/helper-functions.sh
-          version=$( tag_to_version )
-          echo "version=${version}" >> ${GITHUB_OUTPUT}
-          
       - name: calculate_tags
         id: calculate_tags
         shell: bash
         run: |
           . scripts/helper-functions.sh
-          tags=$( platform=amd64 calculate_tags | tr ',' ' ' )
-          all_tags=""
-          for t in ${tags}; do
-              extracted_tag=$(echo ${t} | cut -d ':' -f 2 | \
-                  sed -e 's/-amd64$//')
-              if [ "${extracted_tag}" = "${tag}" ]; then
-                  continue
-              fi
-              if [ -z "${all_tags}" ]; then
-                  all_tags="${t}"
-              else
-                  all_tags="${all_tags},${t}"
-              fi
-          done
-          first_tag=$( echo ${all_tags} | cut -d ',' -f 1 )
+          all_tags=$( calculate_tags )
+          version=$( echo ${all_tags} | cut -d ',' -f 1 )
           rest_tags=$( echo ${all_tags} | cut -d ',' -f 2- )
           echo "all_tags=${all_tags}" >> ${GITHUB_OUTPUT}
-          echo "first_tag=${first_tag}" >> ${GITHUB_OUTPUT}
+          echo "version=${version}" >> ${GITHUB_OUTPUT}
           echo "rest_tags=${rest_tags}" >> ${GITHUB_OUTPUT}
 
   build:
-    needs: determine_version
+    needs: determine_tags
     uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v1
     with:
       images: ${{ github.event.inputs.image }}
-      additional-tags: ${{ needs.determine_version.outputs.rest_tags }}
-      tag: ${{ needs.determine_version.outputs.first_tag }}
+      additional-tags: ${{ needs.determine_tags.outputs.rest_tags }}
+      tag: ${{ needs.determine_tags.outputs.version }}
+      push: ${{ github.event.inputs.push }}
       build-args: |
         input=${{ github.event.inputs.input }}
         tag=${{ github.event.inputs.tag }}
         image=${{ github.event.inputs.image }}
         supplementary=${{ github.event.inputs.supplementary }}
-        version=${{ needs.get_version.outputs.version }}
+        version=${{ needs.determine_tags.outputs.version }}
       cache: false
     secrets: inherit
