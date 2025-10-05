@@ -53,6 +53,9 @@ jobs:
           all_tags=$( calculate_tags )
           version=$( echo ${all_tags} | cut -d ',' -f 1 )
           rest_tags=$( echo ${all_tags} | cut -d ',' -f 2- )
+          if [ "${rest_tags}" = "${all_tags}" ]; then
+              rest_tags=""
+          fi
           echo "all_tags=${all_tags}" >> ${GITHUB_OUTPUT}
           echo "version=${version}" >> ${GITHUB_OUTPUT}
           echo "rest_tags=${rest_tags}" >> ${GITHUB_OUTPUT}
