@@ -36,9 +36,11 @@ setup lsst_distrib
 echo "---begin postinstall cleanup---"
 echo "Pre-cleanup ${stackdir} size:"
 du -sm ${stackdir}
-for dirn in tests src .git; do
-    find ${EUPS_PATH} -name ${dirn} -type d -print0 | xargs -0 rm -rf
+for dirn in tests src bin.src ; do
+    find ${EUPS_PATH} -name ${dirn} -type d -maxdepth 4 -print0 | \
+	xargs -0 rm -rf
 done
+find ${EUPS_PATH} -name .git -type d -print0 | xargs -0 rm -rf
 find ${EUPS_PATH} \
      \( -path "*doc/html" -o -path "*doc/xml" \) \
      -type d -print0 | xargs -0 rm -rf
