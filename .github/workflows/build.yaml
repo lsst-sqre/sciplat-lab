@@ -1,4 +1,4 @@
-name: Manually triggered build of sciplat-lab container
+name: Manually triggered multiplatform build of sciplat-lab container
 
 on:
   workflow_dispatch:
@@ -6,7 +6,6 @@ on:
       tag:
         description: 'EUPS tag of input DM Pipelines Stack container'
         required: true
-        default: ''
       supplementary:
         description: 'Supplementary tag for experimental builds; yields output tag exp_tag_supplementary'
         required: false
@@ -15,7 +14,6 @@ on:
         description: 'fully-qualified URI for output Docker image'
         required: false
         default: 'us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab,docker.io/lsstsqre/sciplat-lab'
-        # someday we will want to remove Docker Hub.
       push:
         description: 'push resulting image; make empty or set to a YAML-false string to build but not push'
         required: false
@@ -34,125 +32,52 @@ permissions:
   statuses: read
 
 jobs:
-  build:
+  determine_tags:
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.calculate_tags.outputs.version }}
+      rest_tags: ${{ steps.calculate_tags.outputs.rest_tags }}
+      all_tags: ${{ steps.calculate_tags.outputs.all_tags }}
+    env:
+      tag: ${{ github.event.inputs.tag }}
+      supplementary: ${{ github.event.inputs.supplementary }}
+      image: ${{ github.event.inputs.image }}
+      input: ${{ github.event.inputs.input }}
+
     steps:
-    - name: checkout
-      uses: actions/checkout@v4
-    - name: import_inputs
-      shell: bash
-      run: |
-        echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
-        echo "supplementary=${{ github.event.inputs.supplementary }}" >> $GITHUB_ENV
-        echo "image=${{ github.event.inputs.image }}" >> $GITHUB_ENV
-        echo "push=${{ github.event.inputs.push }}" >> $GITHUB_ENV
-        echo "input=${{ github.event.inputs.input }}" >> $GITHUB_ENV
+      - name: checkout_setup
+        uses: actions/checkout@v4
 
-    - name: parse_env
-      shell: bash
-      run: |
-         case ${{ env.push }} in
-             ''|n|N|no|No|NO|false|False|FALSE|off|Off|OFF)
-                 echo "target=image" >> $GITHUB_ENV
-                 ;;
-             *)
-                 echo "target=push" >> $GITHUB_ENV
-                 ;;
-         esac
-         make_args="tag=${{ env.tag }}"
-         if [ -n "${{ env.supplementary }}" ]; then
-             make_args="${make_args} supplementary=${{ env.supplementary }}"
-         fi
-         if [ -n "${{ env.image }}" ]; then
-             make_args="${make_args} image=${{ env.image }}"
-         fi
-         echo "make_args=${make_args}" >> $GITHUB_ENV
-         # env.image may be a comma-separated list of images; we are
-         # thus creating a set of registry-specific variables from the
-         # images in the list
-         split_images=$(echo ${{ env.image }} | tr ',' ' ')
-         for img in ${split_images}; do
-             image_host=$(echo ${img} | cut -d '/' -f 1)
-             # Check for implicit Docker Hub
-             case ${image_host} in
-                 *.*)
-                     ;;
-                 *)
-                     image_host="docker.io"
-                     ;;
-             esac
-             case ${image_host} in
-                 docker.com | docker.io | *.docker.com | *.docker.io)
-                     d_tag="docker_"
-                     d_registry="docker.io"
-                     d_username="${{ secrets.DOCKER_USERNAME }}"
-                     d_password="${{ secrets.DOCKER_TOKEN }}"
-                     ;;
-                 ghcr.io | *.ghcr.io)
-                     d_tag="github_"
-                     d_registry="ghcr.io"
-                     # using secrets.GITHUB_TOKEN fails, saying it doesn't
-                     # have write.package, which seems weird.
-                     d_username="token"
-                     d_password="${{ secrets.GHCR_PUSH_TOKEN}}"
-                     ;;
-                 *-docker.pkg.dev)
-                    d_tag="google_"
-                    d_registry="${image_host}"
-                    d_username="_json_key_base64"
-                    d_password="${{ secrets.GAR_PUSH_TOKEN }}"
-                    ;;
-                 *)
-                     d_tag=""
-                     d_registry="${image_host}"
-                     d_username=""
-                     d_password=""
-                     ;;
-             esac
-             echo "${d_tag}registry=${d_registry}" >> $GITHUB_ENV
-             echo "${d_tag}username=${d_username}" >> $GITHUB_ENV
-             echo "${d_tag}password=${d_password}" >> $GITHUB_ENV
-         done
+      - name: calculate_tags
+        id: calculate_tags
+        shell: bash
+        run: |
+          . scripts/helper-functions.sh
+          all_tags=$( calculate_tags )
+          version=$( echo ${all_tags} | cut -d ',' -f 1 )
+          rest_tags=$( echo ${all_tags} | cut -d ',' -f 2- )
+          if [ "${rest_tags}" = "${all_tags}" ]; then
+              rest_tags=""
+          fi
+          echo "all_tags=${all_tags}" >> ${GITHUB_OUTPUT}
+          echo "version=${version}" >> ${GITHUB_OUTPUT}
+          echo "rest_tags=${rest_tags}" >> ${GITHUB_OUTPUT}
 
-    # Only bother logging in to a given site if we're going to push the
-    # container and we have credentials
-    - name: Log in to Docker Hub repository
-      if: >-
-        ((env.target == 'push') &&
-         (env.docker_registry != '') &&
-         (env.docker_username != '') &&
-         (env.docker_password != ''))
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.docker_registry }}
-        username: ${{ env.docker_username }}
-        password: ${{ env.docker_password }}
-    - name: Log in to GitHub Container Registry
-      if: >-
-        ((env.target == 'push') &&
-         (env.github_registry != '') &&
-         (env.github_username != '') &&
-         (env.github_password != ''))
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.github_registry }}
-        username: ${{ env.github_username }}
-        password: ${{ env.github_password }}
-    - name: Log in to Google Artifact Registry
-      if: >-
-        ((env.target == 'push') &&
-         (env.google_registry != '') &&
-         (env.google_username != '') &&
-         (env.google_password != ''))
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.google_registry }}
-        username: ${{ env.google_username }}
-        password: ${{ env.google_password }}
-
-    - name: build
-      shell: bash
-      run: |
-            make ${{ env.make_args }} ${{ env.target }}
-
+  build:
+    needs: determine_tags
+    uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v1
+    with:
+      images: ${{ github.event.inputs.image }}
+      additional-tags: ${{ needs.determine_tags.outputs.rest_tags }}
+      tag: ${{ needs.determine_tags.outputs.version }}
+      use-nonstandard-ghcr-token: true
+      build-args: |
+        input=${{ github.event.inputs.input }}
+        tag=${{ github.event.inputs.tag }}
+        image=${{ github.event.inputs.image }}
+        supplementary=${{ github.event.inputs.supplementary }}
+        version=${{ needs.determine_tags.outputs.version }}
+      cache: false
+      push: ${{ fromJSON(github.event.inputs.push) }}
+    secrets: inherit
