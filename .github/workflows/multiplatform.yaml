@@ -17,7 +17,7 @@ on:
       input:
         description: 'input image; you probably should change at most the tag'
         required: false
-        default: 'ghcr.io/lsst-sqre/nublado-jupyterlab-base:tickets-DM-52583'
+        default: 'ghcr.io/lsst-sqre/nublado-jupyterlab-base:latest'
 
 # We need actions/write if we want to do a GH App, and we need
 # packages/write to push to ghcr.io with GITHUB_TOKEN
