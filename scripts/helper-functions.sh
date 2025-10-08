@@ -16,7 +16,7 @@ input_tag_to_version() {
         if [ "${build_number}" = "" ]; then
             build_number=0
         fi
-        version="${version}_rsp${build_number}"    
+        version="${version}_rsp${build_number}"
     fi
     echo "${version}"
 }
@@ -24,10 +24,10 @@ input_tag_to_version() {
 calculate_tags() {
     if [ -z "${tag}" ] || [ -z "${image}" ]; then
         echo "required variables: tag, image" >&2
-	exit 1
+        exit 1
     fi
 
-    branch=$(git rev-parse --abbrev-ref HEAD || /bin/true )
+    branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || /bin/true )
     if [ -n "${OVERRIDE_BRANCH}" ]; then
         branch="${OVERRIDE_BRANCH}"
     fi
@@ -35,7 +35,7 @@ calculate_tags() {
         echo "cannot determine git branch" >&2
         branch="NOGIT"
     fi
-    
+
     release_branch="main"
 
     version=$(input_tag_to_version)
@@ -49,6 +49,12 @@ calculate_tags() {
         version="exp_${version}_${supplementary}"
     fi
     tag_type=$(echo ${version} | cut -c 1)
+
+    # Experimentals do not get tagged as latest anything.  Dailies,
+    #  weeklies, and releases get tagged as latest_<category>.  The
+    #  "latest" tag for the lab container should always point to the
+    #  latest weekly or release, but not a daily, since we make no
+    #  guarantees that the daily is fit for purpose.
 
     ltype=""
     latest=""
@@ -77,4 +83,3 @@ calculate_tags() {
     fi
     echo ${tagset}
 }
-
