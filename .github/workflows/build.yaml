@@ -71,7 +71,7 @@ jobs:
       images: ${{ github.event.inputs.image }}
       additional-tags: ${{ needs.determine_tags.outputs.rest_tags }}
       tag: ${{ needs.determine_tags.outputs.version }}
-      use-nonstandard-ghcr-token: true
+      # use-nonstandard-ghcr-token: true
       build-args: |
         input=${{ github.event.inputs.input }}
         tag=${{ github.event.inputs.tag }}
