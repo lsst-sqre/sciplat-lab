@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: checkout_setup
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: calculate_tags
         id: calculate_tags
@@ -66,12 +66,11 @@ jobs:
 
   build:
     needs: determine_tags
-    uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v1
+    uses: lsst-sqre/multiplatform-build-and-push/.github/workflows/build.yaml@v2
     with:
       images: ${{ github.event.inputs.image }}
       additional-tags: ${{ needs.determine_tags.outputs.rest_tags }}
       tag: ${{ needs.determine_tags.outputs.version }}
-      use-nonstandard-ghcr-token: true
       build-args: |
         input=${{ github.event.inputs.input }}
         tag=${{ github.event.inputs.tag }}
