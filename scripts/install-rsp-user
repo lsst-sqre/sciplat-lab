@@ -55,7 +55,8 @@ uv pip install --no-build-isolation \
     'lsst-rsp>=0.7.1' \
     structlog \
     'symbolicmode<3' \
-    'jupyter_firefly_extensions>=0.15.0'
+    'jupyter_firefly_extensions>=0.15.0' \
+    'jupyter_server_documents'
 
 # Turn off console
 jupyter labextension disable @jupyterlab/console-extension
