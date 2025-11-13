@@ -39,21 +39,15 @@ pip install uv
 # lower-level layers have already installed the package, pinned to a version
 # they need, we won't upgrade it.  But if it isn't already installed, we'll
 # just take the latest available.  `--no-build-isolation` ensures that any
-# source packages use C++ libraries from conda-forge.
+# source packages use C++ libraries from conda-forge, and that we're also
+# responsible for the dependencies not already provided by something in the
+# conda env.  In this case, structlog and symbolicmode from lsst-rsp.
 
-# Try lsdb separately, do *not* say "--no-build-isolation" because we need to
-# pull in a newer pyarrow.
-
-# Once rubin-env 11 is released, lsdb (and a compatible pyarrow) will be in
-# rubin-env-rsp, and we can stop doing this.
-uv pip install 'lsdb>=0.6.3'
-
-# "--no-build-isolation" means we're also responsible for the dependencies
-# not already provided by something in the conda env.  In this case,
-# structlog and symbolicmode from lsst-rsp.
+# This requires a base container built with tickets/DM-53207, until we merge
+# that work.
 uv pip install --no-build-isolation \
-    'lsst-rsp>=0.7.1' \
-    structlog \
+    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-53207' \
+    'structlog' \
     'symbolicmode<3' \
     'jupyter_firefly_extensions>=0.15.0' \
     'jupyter_server_documents'
@@ -70,6 +64,3 @@ uv cache clean
 source /usr/local/share/jupyterlab/venv/bin/activate
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
-
-# Add spellchecker to UI python
-uv pip install jupyterlab-spellchecker
