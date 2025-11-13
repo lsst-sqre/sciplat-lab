@@ -57,6 +57,9 @@ COPY runtime/lsst_kernel.json \
 COPY scripts/install-rsp-user /tmp/build
 RUN ./install-rsp-user
 
+COPY scripts/install-typst /tmp/build
+RUN ./install-typst
+
 FROM base-stack-image AS compat-rsp-image
 
 # Add compatibility layer to allow for transition from old to new

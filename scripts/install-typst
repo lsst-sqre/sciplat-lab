@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# This must come after rubin-env-rsp installation, because we need
+# cargo in the environment.
+
+stackdir=/opt/lsst/software/stack
+source ${stackdir}/loadLSST.bash
+
+cargo install --locked typst-cli
