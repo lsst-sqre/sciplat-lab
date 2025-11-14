@@ -28,8 +28,7 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 # Lab environment packages.
 conda install -y "rubin-env-rsp==${rubin_env_ver}"
 
-conda install -y \
-      ipython_genutils # Until added to rubin-env-rsp
+conda install -y hats-import[full]
 
 # uv is compatible with pip but much faster.
 pip install uv
@@ -39,18 +38,9 @@ pip install uv
 # lower-level layers have already installed the package, pinned to a version
 # they need, we won't upgrade it.  But if it isn't already installed, we'll
 # just take the latest available.  `--no-build-isolation` ensures that any
-# source packages use C++ libraries from conda-forge.
-
-# Try lsdb separately, do *not* say "--no-build-isolation" because we need to
-# pull in a newer pyarrow.
-
-# Once rubin-env 11 is released, lsdb (and a compatible pyarrow) will be in
-# rubin-env-rsp, and we can stop doing this.
-uv pip install 'lsdb>=0.6.3'
-
-# "--no-build-isolation" means we're also responsible for the dependencies
-# not already provided by something in the conda env.  In this case,
-# structlog and symbolicmode from lsst-rsp.
+# source packages use C++ libraries from conda-forge and that we're also
+# responsible for the dependencies not already provided by something in the
+# conda env.  In this case, structlog and symbolicmode from lsst-rsp.
 uv pip install --no-build-isolation \
     'lsst-rsp>=0.7.1' \
     structlog \
