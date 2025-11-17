@@ -48,7 +48,18 @@ pip install uv
 conda install -y orjson pyside6 authlib
 
 # These are the packages themselves, in the "lsstts" channel.
-conda install -y -c lsstts ts-m1m3-utils ts-xml ts-utils ts-salobj
+# But we cannot use these until the conda packages are compatible with
+# current rubin-env and hence Python 3.13 (as of 17 Nov. 2025).
+# conda install -y -c lsstts ts-m1m3-utils ts-xml ts-utils ts-salobj
+#
+# T&S does not publish packages to pypi.  So we have to install from
+# their git repository directly, and `--no-build-isolation` may make this
+# more difficult.
+uv pip install --no-build-isolation \
+   git+https://github.com/lsst-ts/ts_m1m3_utils \
+   git+https://github.com/lsst-ts/ts_xml \
+   git+https://github.com/lsst-ts/ts_utils \
+   git+https://github.com/lsst-ts/ts_salobj
 
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
