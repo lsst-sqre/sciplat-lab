@@ -55,11 +55,33 @@ conda install -y orjson pyside6 authlib
 # T&S does not publish packages to pypi.  So we have to install from
 # their git repository directly, and `--no-build-isolation` may make this
 # more difficult.
-uv pip install --no-build-isolation \
-   git+https://github.com/lsst-ts/ts_m1m3_utils \
-   git+https://github.com/lsst-ts/ts_xml \
-   git+https://github.com/lsst-ts/ts_utils \
-   git+https://github.com/lsst-ts/ts_salobj
+#
+# We are going to determine the most recent tag for each repo, and install
+# that, rather than a (possibly unreleased) tip.
+#
+# `git ls-remote` does that: `--refs --tags` says only list the tags, and
+# `--sort="-version:refname"` says, list the tags with the highest version
+# first.  Then throw away any alpha, beta, and rc tags.  Take the first thing
+# that's left with `head -1`, and discard the commit hash with `awk`.  Finally
+# extract the tag from the reference with `sed`.
+
+tsrepos="ts_m1m3_utils ts_xml ts_utils ts_salobj"
+
+pip_urls=""
+for r in ${tsrepos}; do
+    url="https://github.com/lsst-ts/${r}"
+    tag=$(git ls-remote --sort="-version:refname" --refs --tags ${url} | \
+	      grep -v alpha | grep -v beta | grep -v rc | \
+	      head -1 | awk '{print $2}' | sed -e 's|refs/tags/||' )
+    pip_url="git+${url}@${tag}"
+    if [ -z "${pip_urls}" ]; then
+	pip_urls=${pip_url}
+    else
+	pip_urls="${pip_urls} ${pip_url}"
+    fi
+done
+    
+uv pip install --no-build-isolation ${pip_urls}
 
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
