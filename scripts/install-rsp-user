@@ -65,28 +65,34 @@ conda install -y orjson pyside6 authlib
 # that's left with `head -1`, and discard the commit hash with `awk`.  Finally
 # extract the tag from the reference with `sed`.
 
-tsrepos="ts_m1m3_utils ts_xml ts_utils ts_salobj"
+# tsrepos="ts_m1m3_utils ts_xml ts_utils ts_salobj"
 
-pip_urls=""
-for r in ${tsrepos}; do
-    url="https://github.com/lsst-ts/${r}"
-    tag=$(git ls-remote --sort="-version:refname" --refs --tags ${url} | \
-	      grep -v alpha | grep -v beta | grep -v rc | \
-	      head -1 | awk '{print $2}' | sed -e 's|refs/tags/||' )
-    pip_url="git+${url}@${tag}"
-    if [ -z "${pip_urls}" ]; then
-	pip_urls=${pip_url}
-    else
-	pip_urls="${pip_urls} ${pip_url}"
-    fi
-done
+# pip_urls=""
+# for r in ${tsrepos}; do
+#     url="https://github.com/lsst-ts/${r}"
+#     tag=$(git ls-remote --sort="-version:refname" --refs --tags ${url} | \
+# 	      grep -v alpha | grep -v beta | grep -v rc | \
+# 	      head -1 | awk '{print $2}' | sed -e 's|refs/tags/||' )
+#     pip_url="git+${url}@${tag}"
+#     if [ -z "${pip_urls}" ]; then
+# 	pip_urls=${pip_url}
+#     else
+# 	pip_urls="${pip_urls} ${pip_url}"
+#     fi
+# done
 
-echo "Installing T&S repos from github: ${pip_urls}"
+# echo "Installing T&S repos from github: ${pip_urls}"
 
 # Of course this fails with `--no-build-isolation` but I guess this is just
 # where we are now.
 # uv pip install --no-build-isolation ${pip_urls}
-uv pip install ${pip_urls}
+# uv pip install ${pip_urls}
+
+uv pip install \
+   git+https://github.com/lsst-ts/ts_m1m3_utils@v0.5.0 \
+   git+https://github.com/lsst-ts/ts_xml@24.3.0 \
+   git+https://github.com/lsst-ts/ts_utils@v1.2.8 \
+   git+https://github.com/lsst-ts/ts_salobj@v8.2.6
 
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
