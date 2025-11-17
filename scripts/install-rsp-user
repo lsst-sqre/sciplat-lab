@@ -28,9 +28,6 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 # Lab environment packages.
 conda install -y "rubin-env-rsp==${rubin_env_ver}"
 
-conda install -y \
-      ipython_genutils # Until added to rubin-env-rsp
-
 # uv is compatible with pip but much faster.
 pip install uv
 
@@ -41,12 +38,17 @@ pip install uv
 # just take the latest available.  `--no-build-isolation` ensures that any
 # source packages use C++ libraries from conda-forge.
 
-# Try lsdb separately, do *not* say "--no-build-isolation" because we need to
-# pull in a newer pyarrow.
+# Nothing currently
 
-# Once rubin-env 11 is released, lsdb (and a compatible pyarrow) will be in
-# rubin-env-rsp, and we can stop doing this.
-uv pip install 'lsdb>=0.6.3'
+# These are Telescope and Site packages we're putting in the base build
+# to make life easier for users at USDF.  Other users can just ignore them
+# and they don't have a downside other than making the image somewhat larger.
+
+# These are available at conda-forge and are dependencies of the T&S packages.
+conda install -y orjson pyside6 authlib
+
+# These are the packages themselves, in the "lsstts" channel.
+conda install -y -c lsstts ts-m1m3-utils ts-xml ts-utils ts-salobj
 
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
