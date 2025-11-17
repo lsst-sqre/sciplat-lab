@@ -80,8 +80,19 @@ for r in ${tsrepos}; do
 	pip_urls="${pip_urls} ${pip_url}"
     fi
 done
-    
-uv pip install --no-build-isolation ${pip_urls}
+
+echo "Installing T&S repos from github: ${pip_urls}"
+
+# uv pip install --no-build-isolation ${pip_urls}
+
+uv pip install --no-build-isolation \
+   git+https://github.com/lsst-ts/ts_m1m3_utils@v0.5.0 \
+   git+https://github.com/lsst-ts/ts_xml@v24.3.0 \
+   git+https://github.com/lsst-ts/ts_utils@v1.2.8 \
+   git+https://github.com/lsst-ts/ts_salobj@v8.2.6
+   
+   
+   
 
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
