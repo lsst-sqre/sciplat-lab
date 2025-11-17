@@ -83,16 +83,10 @@ done
 
 echo "Installing T&S repos from github: ${pip_urls}"
 
+# Of course this fails with `--no-build-isolation` but I guess this is just
+# where we are now.
 # uv pip install --no-build-isolation ${pip_urls}
-
-uv pip install --no-build-isolation \
-   git+https://github.com/lsst-ts/ts_m1m3_utils@v0.5.0 \
-   git+https://github.com/lsst-ts/ts_xml@v24.3.0 \
-   git+https://github.com/lsst-ts/ts_utils@v1.2.8 \
-   git+https://github.com/lsst-ts/ts_salobj@v8.2.6
-   
-   
-   
+uv pip install ${pip_urls}
 
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
