@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -x
-set -euo pipefail
+# -u makes conda fail, via conda ADDR2LINE: unbound variable.
+set -eo pipefail
 
 for f in passwd group shadow gshadow; do
     rm -f /etc/${f} /etc/${f}-
@@ -9,9 +10,16 @@ done
 # Copy logos across
 JLV=/usr/local/share/jupyterlab/venv
 cp ${JLV}/share/jupyter/kernels/python3/logo* \
-     /usr/local/share/jupyter/kernels/lsst
+   /usr/local/share/jupyter/kernels/lsst
+
+stackdir=/opt/lsst/software/stack
+set +x  # Conda's really noisy
+source $stackdir/loadLSST.bash
+rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
+set -x
+rubin_env="/opt/lsst/software/stack/conda/envs/${rubin_env_ver}"
 # Remove default kernels
-for d in ${JLV} /opt/lsst/software/stack/conda/envs/lsst-scipipe-10.0.0 ; do
+for d in ${JLV} ${rubin_env} ; do
     rm -rf ${d}/share/jupyter/kernels/python3
 done
 

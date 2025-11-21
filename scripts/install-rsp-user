@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-set -x
+
 # -u causes failure in activate: ADDR2LINE: unbound variable
+# -x is just insanely noisy in the presence of conda
 set -eo pipefail
 stackdir=/opt/lsst/software/stack
 
@@ -42,11 +43,9 @@ conda install -y -c lsstts ts-m1m3-utils ts-salobj ts-utils
 # pull in a newer pyarrow.
 
 # "--no-build-isolation" means we're also responsible for the dependencies
-# not already provided by something in the conda env.  In this case,
-# symbolicmode from lsst-rsp.
+# not already provided by something in the conda env.
 uv pip install --no-build-isolation \
-    'lsst-rsp>=0.7.1' \
-    'symbolicmode<3' \
+    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-53638' \
     'jupyter_firefly_extensions>=0.15.0'
 
 # Turn off console
@@ -64,3 +63,11 @@ jupyter labextension lock @jupyterlab/console-extension
 
 # Add spellchecker to UI python
 uv pip install jupyterlab-spellchecker
+
+# Replace lsst-rsp and rje in UI python with branch version
+uv pip install hatchling hatch-nodejs-version
+
+uv pip install \
+   'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-53638' \
+   'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-53638' \
+
