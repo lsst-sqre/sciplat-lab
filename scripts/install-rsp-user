@@ -39,9 +39,6 @@ conda install -y uv structlog
 
 conda install -y -c lsstts ts-m1m3-utils ts-salobj ts-utils
 
-# Try lsdb separately, do *not* say "--no-build-isolation" because we need to
-# pull in a newer pyarrow.
-
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # symbolicmode from lsst-rsp.
