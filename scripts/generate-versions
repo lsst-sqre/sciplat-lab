@@ -14,7 +14,7 @@ python -m pip list | tee "system-python"
 # Now JupyterLab python
 
 source /usr/local/share/jupyterlab/venv/bin/activate
-python -m uv pip list | tee "jupyterlab-python"
+uv pip list | tee "jupyterlab-python"
 ((jupyter labextension list 2>&1) | tee "lab-extensions") || /bin/true
 deactivate
 

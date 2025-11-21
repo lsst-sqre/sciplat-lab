@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-set -x
 
 # -u makes lsstinstall fail, via conda ADDR2LINE: unbound variable.
+# -x is very noisy for this script and hurts more than it helps.
 set -eo pipefail
 
 TAG=$1
