@@ -42,8 +42,11 @@ conda install -y -c lsstts ts-m1m3-utils ts-salobj ts-utils
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # symbolicmode from lsst-rsp.
+#
+# For right now, use lsst-rsp from a branch.
+#
 uv pip install --no-build-isolation \
-    'lsst-rsp>=0.7.1' \
+    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-53305' \
     'symbolicmode<3' \
     'jupyter_firefly_extensions>=0.15.0'
 
@@ -54,6 +57,10 @@ jupyter labextension lock @jupyterlab/console-extension
 # Clean caches
 conda clean -a -y -f
 uv cache clean
+
+#
+# UI Python modifications
+#
 
 # Turn off console in UI python too
 source /usr/local/share/jupyterlab/venv/bin/activate
