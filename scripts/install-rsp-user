@@ -29,10 +29,9 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 # Lab environment packages.
 conda install -y "rubin-env-rsp==${rubin_env_ver}"
 
-# uv is compatible with pip but much faster.  Structlog is a dependency
-# of lsst-rsp.
+# Structlog is a dependency of lsst-rsp.  We use uv from the base container.
 
-conda install -y uv structlog
+conda install -y structlog
 
 # To make life easier at USDF we are adding three T&S packages that are not
 # available from conda-forge.
@@ -42,11 +41,8 @@ conda install -y -c lsstts ts-m1m3-utils ts-salobj ts-utils
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # symbolicmode from lsst-rsp.
-#
-# For right now, use lsst-rsp from a branch.
-#
 uv pip install --no-build-isolation \
-    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-53305' \
+    'lsst-rsp' \
     'symbolicmode<3' \
     'jupyter_firefly_extensions>=0.15.0'
 
