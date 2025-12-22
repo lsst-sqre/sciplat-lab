@@ -45,7 +45,7 @@ conda install -y -c lsstts ts-m1m3-utils ts-salobj ts-utils
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.
 uv pip install --no-build-isolation \
-    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-53638' \
+    'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-53703' \
     'jupyter_firefly_extensions>=0.15.0'
 
 # Turn off console
@@ -68,6 +68,6 @@ uv pip install jupyterlab-spellchecker
 uv pip install hatchling hatch-nodejs-version
 
 uv pip install \
-   'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-53638' \
-   'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-53638' \
+   'git+https://github.com/lsst-sqre/lsst-rsp@tickets/DM-53703' \
+   'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-53638'
 
