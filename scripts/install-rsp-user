@@ -46,7 +46,7 @@ conda install -y -c lsstts ts-m1m3-utils ts-salobj ts-utils
 # not already provided by something in the conda env.  In this case,
 # symbolicmode from lsst-rsp.
 uv pip install --no-build-isolation \
-    'lsst-rsp>=0.7.1' \
+    'lsst-rsp>=0.10.2' \
     'symbolicmode<3' \
     'jupyter_firefly_extensions>=0.15.0'
 
@@ -65,3 +65,8 @@ jupyter labextension lock @jupyterlab/console-extension
 
 # Add spellchecker to UI python
 uv pip install jupyterlab-spellchecker
+# Replace lsst-rsp and rje in UI python with branch version
+uv pip install hatchling hatch-nodejs-version
+
+uv pip install \
+   'git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-53706'
