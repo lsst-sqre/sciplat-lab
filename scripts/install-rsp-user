@@ -46,7 +46,7 @@ conda install -y -c lsstts ts-m1m3-utils ts-salobj ts-utils
 # not already provided by something in the conda env.  In this case,
 # symbolicmode from lsst-rsp.
 uv pip install --no-build-isolation \
-    'lsst-rsp>=0.7.1' \
+    'lsst-rsp>=0.7.1,<0.10.0' \
     'symbolicmode<3' \
     'jupyter_firefly_extensions>=0.15.0'
 
@@ -65,3 +65,6 @@ jupyter labextension lock @jupyterlab/console-extension
 
 # Add spellchecker to UI python
 uv pip install jupyterlab-spellchecker
+
+# Force lsst-rsp < 10 until nublado 11 is everywhere
+uv pip install --reinstall-package 'lsst-rsp<0.10.0'
