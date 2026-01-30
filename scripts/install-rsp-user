@@ -27,12 +27,11 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 
 # Refactor of rubin-env-rsp coming later to separate user packages from
 # Lab environment packages.
-conda install -y "rubin-env-rsp==${rubin_env_ver}"
+conda install -y --no-update-deps "rubin-env-rsp==${rubin_env_ver}"
 
-# uv is compatible with pip but much faster.  Structlog is a dependency
-# of lsst-rsp.
+# Structlog is a dependency of lsst-rsp.
 
-conda install -y uv structlog
+conda install -y structlog
 
 # To make life easier at USDF we are adding three T&S packages that are not
 # available from conda-forge.
