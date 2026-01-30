@@ -27,7 +27,14 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 
 # Refactor of rubin-env-rsp coming later to separate user packages from
 # Lab environment packages.
+set +e
 conda install -y --no-update-deps "rubin-env-rsp==${rubin_env_ver}"
+rc=$?
+if [ ${rc} -ne 0 ]; then
+    echo "Conda installation with --no-update-deps failed; retrying without"
+    conda install -y "rubin-env-rsp==${rubin_env_ver}"
+fi
+set -e
 
 # Structlog is a dependency of lsst-rsp.
 
