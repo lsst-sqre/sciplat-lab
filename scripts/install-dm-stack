@@ -21,7 +21,14 @@ curl -OL https://ls.st/lsstinstall
 chmod u+x lsstinstall
 # Alas, if we don't run it with bash, some of the activate scripts
 # (rust and openmpi) fail, because they assume bash, not POSIX shell.
+set +e
 bash ./lsstinstall -X -T $TAG
+rc=$?
+if [ ${rc} -ne 0 ]; then
+    echo "lsstinstall with -X failed; retrying without"
+    bash ./lsstinstall -T ${TAG}
+fi
+set -e
 source $stackdir/loadLSST.bash
 for prod in $EUPS_PRODUCTS; do
     eups distrib install --no-server-tags "$prod" -t "$EUPS_TAG"
