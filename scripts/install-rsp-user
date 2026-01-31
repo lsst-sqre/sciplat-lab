@@ -56,10 +56,6 @@ uv pip install --no-build-isolation \
     'symbolicmode<3' \
     'jupyter_firefly_extensions>=0.15.0'
 
-# Turn off console
-jupyter labextension disable @jupyterlab/console-extension
-jupyter labextension lock @jupyterlab/console-extension
-
 # Clean caches
 conda clean -a -y -f
 uv cache clean
