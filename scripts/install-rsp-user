@@ -27,14 +27,63 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 
 # Refactor of rubin-env-rsp coming later to separate user packages from
 # Lab environment packages.
-set +e
-conda install -y --no-update-deps "rubin-env-rsp==${rubin_env_ver}"
-rc=$?
-if [ ${rc} -ne 0 ]; then
-    echo "Conda installation with --no-update-deps failed; retrying without"
-    conda install -y "rubin-env-rsp==${rubin_env_ver}"
-fi
-set -e
+# conda install -y --no-update-deps "rubin-env-rsp==${rubin_env_ver}"
+
+# Here's that refactor.
+# gcsfs has some dep problems; leave it out for now but we might need it.
+conda install -y --no-update-deps \
+    awkward \
+    awkward-pandas \
+    bokeh \
+    bqplot \
+    ciso8601 \
+    cloudpickle \
+    dask-core \
+    datashader \
+    fastparquet \
+    ffmpeg \
+    freetype-py \
+    geoviews \
+    gh \
+    ginga \
+    graphicsmagick \
+    graphviz \
+    hdf5plugin \
+    holoviews \
+    httpx \
+    hvplot \
+    intake \
+    intake-parquet \
+    ipykernel \
+    jedi \
+    jupyter \
+    lsdb \
+    lsst-efd-client \
+    mermaid-py \
+    mysqlclient \
+    nbval \
+    panel \
+    papermill \
+    paramnb \
+    partd \
+    plotly \
+    pre-commit \
+    pypandoc \
+    pyshp \
+    python-snappy \
+    python-socketio \
+    pyvo \
+    regions \
+    ripgrep \
+    rubin-nights \
+    rubin-scheduler \
+    rubin-sim \
+    sbpy \
+    schedview \
+    snappy \
+    toolz \
+    wget \
+    xarray
 
 # Structlog is a dependency of lsst-rsp.
 
@@ -45,22 +94,18 @@ conda install -y structlog
 
 conda install -y -c lsstts ts-m1m3-utils ts-salobj ts-utils
 
-# Try lsdb separately, do *not* say "--no-build-isolation" because we need to
-# pull in a newer pyarrow.
-
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
 # symbolicmode from lsst-rsp.
 uv pip install --no-build-isolation \
     'lsst-rsp>=0.7.1' \
-    'symbolicmode<3' \
-    'jupyter_firefly_extensions>=0.15.0'
+    'symbolicmode<3'
 
 # Clean caches
 conda clean -a -y -f
 uv cache clean
 
-# Turn off console in UI python too
+# Turn off console in UI python
 source /usr/local/share/jupyterlab/venv/bin/activate
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
