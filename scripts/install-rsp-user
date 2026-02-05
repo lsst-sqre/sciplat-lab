@@ -38,15 +38,25 @@ set -e
 
 # Structlog is a dependency of lsst-rsp.
 
-conda install -y structlog
+conda install -y --no-update-deps structlog
 
 # To make life easier at USDF we are adding three T&S packages that are not
 # available from conda-forge.
 
-conda install -y -c lsstts ts-m1m3-utils ts-salobj ts-utils
+conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils
 
-# Try lsdb separately, do *not* say "--no-build-isolation" because we need to
-# pull in a newer pyarrow.
+# Try lsdb separately, do *not* say "--no-build-isolation" or
+# "--no-update-deps"because we may need to pull in a newer pyarrow.
+#
+# It went into rubin-env-rsp in rubin-env 11, but we might need to rebuild an
+# earlier image (e.g. 29.2.0).  Remove this after we're done with the 29.x.x
+# series.
+
+have_lsdb=$(conda list --export | grep lsdb) || /bin/true
+if [ -z "${have_lsdb}" ]; then
+    echo "Doing separate installation of lsdb."
+    conda install -y lsdb
+fi
 
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
@@ -60,7 +70,7 @@ uv pip install --no-build-isolation \
 conda clean -a -y -f
 uv cache clean
 
-# Turn off console in UI python too
+# Turn off console in UI python.
 source /usr/local/share/jupyterlab/venv/bin/activate
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
