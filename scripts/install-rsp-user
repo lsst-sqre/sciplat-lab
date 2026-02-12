@@ -51,11 +51,14 @@ conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils
 # It went into rubin-env-rsp in rubin-env 11, but we might need to rebuild an
 # earlier image (e.g. 29.2.0).  Remove this after we're done with the 29.x.x
 # series.
+#
+# Note that lsdb 0.6.4 is the version that is compatible with the rest of
+# rubin-env 11, paired with hats 0.6.4.  That also needs cdshealpix 0.7.1.
 
 have_lsdb=$(conda list --export | grep lsdb) || /bin/true
 if [ -z "${have_lsdb}" ]; then
-    echo "Doing separate installation of lsdb."
-    conda install -y lsdb
+    echo "Doing separate installation of lsdb/hats 0.6.4"
+    conda install -y lsdb=0.6.4 hats=0.6.4 cdshealpix=0.7.1
 fi
 
 # "--no-build-isolation" means we're also responsible for the dependencies
