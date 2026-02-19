@@ -87,12 +87,12 @@ conda install -y --no-update-deps \
 
 # Structlog is a dependency of lsst-rsp.
 
-conda install -y structlog
+conda install -y --no-update-deps structlog
 
 # To make life easier at USDF we are adding three T&S packages that are not
 # available from conda-forge.
 
-conda install -y -c lsstts ts-m1m3-utils ts-salobj ts-utils
+conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils
 
 # "--no-build-isolation" means we're also responsible for the dependencies
 # not already provided by something in the conda env.  In this case,
