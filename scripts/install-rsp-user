@@ -30,7 +30,9 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 # conda install -y --no-update-deps "rubin-env-rsp==${rubin_env_ver}"
 
 # Here's that refactor.
-# gcsfs has some dep problems; leave it out for now but we might need it.
+# gcsfs depends on google-cloud-storage-control, which nothing provides.
+# I suspect that's a typo for "google-cloud-storage", but...well, we can
+# live without gcsfs for now.
 conda install -y --no-update-deps \
     awkward \
     awkward-pandas \
@@ -59,6 +61,7 @@ conda install -y --no-update-deps \
     jupyter \
     lsdb \
     lsst-efd-client \
+    lsst-rsp \
     mermaid-py \
     mysqlclient \
     nbval \
@@ -74,6 +77,7 @@ conda install -y --no-update-deps \
     python-socketio \
     pyvo \
     regions \
+    reproject \
     ripgrep \
     rubin-nights \
     rubin-scheduler \
@@ -93,13 +97,6 @@ conda install -y --no-update-deps structlog
 # available from conda-forge.
 
 conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils
-
-# "--no-build-isolation" means we're also responsible for the dependencies
-# not already provided by something in the conda env.  In this case,
-# symbolicmode from lsst-rsp.
-uv pip install --no-build-isolation \
-    'lsst-rsp>=0.7.1' \
-    'symbolicmode<3'
 
 # Clean caches
 conda clean -a -y -f

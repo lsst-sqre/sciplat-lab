@@ -15,7 +15,7 @@ COPY etc/group  /etc/group
 RUN grpconv && pwconv
 
 COPY scripts/install-system-packages /tmp/build
-RUN ./install-system-packages
+RUN /tmp/build/install-system-packages
 
 # /etc/profile.d parts
 
@@ -46,7 +46,7 @@ FROM base-image AS base-stack-image
 ARG tag
 
 COPY scripts/install-dm-stack /tmp/build
-RUN ./install-dm-stack ${tag}
+RUN /tmp/build/install-dm-stack ${tag}
 
 COPY etc/rsp_notice etc/20-logging.py \
      /usr/local/share/jupyterlab/etc/
@@ -55,7 +55,7 @@ COPY runtime/lsst_kernel.json \
     runtime/lsstlaunch.bash /usr/local/share/jupyterlab/
 
 COPY scripts/install-rsp-user /tmp/build
-RUN ./install-rsp-user
+RUN /tmp/build/install-rsp-user
 
 FROM base-stack-image AS compat-rsp-image
 
@@ -63,7 +63,7 @@ FROM base-stack-image AS compat-rsp-image
 # paths.
 
 COPY scripts/install-compat /tmp/build
-RUN ./install-compat
+RUN /tmp/build/install-compat
 
 FROM compat-rsp-image AS manifests-rsp-image
 
@@ -71,7 +71,7 @@ FROM compat-rsp-image AS manifests-rsp-image
 # "what broke this week?"
 
 COPY scripts/generate-versions /tmp/build
-RUN ./generate-versions
+RUN /tmp/build/generate-versions
 
 FROM manifests-rsp-image AS rsp-image
 ARG version
@@ -83,8 +83,8 @@ USER 0:0
 WORKDIR /
 
 COPY scripts/cleanup-files /
-RUN ./cleanup-files
-RUN rm ./cleanup-files
+RUN /cleanup-files
+RUN rm /cleanup-files
 
 # Run by default as an unprivileged user.  In real life, the Nublado
 # controller will set this correctly.  The default is conventionally
