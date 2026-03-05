@@ -30,7 +30,6 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 # conda install -y --no-update-deps "rubin-env-rsp==${rubin_env_ver}"
 
 # Here's that refactor.
-# gcsfs has some dep problems; leave it out for now but we might need it.
 conda install -y --no-update-deps \
     awkward \
     awkward-pandas \
@@ -54,11 +53,13 @@ conda install -y --no-update-deps \
     hvplot \
     intake \
     intake-parquet \
+    ipympl \
     ipykernel \
     jedi \
     jupyter \
     lsdb \
     lsst-efd-client \
+    lsst-rsp \
     mermaid-py \
     mysqlclient \
     nbval \
@@ -74,6 +75,7 @@ conda install -y --no-update-deps \
     python-socketio \
     pyvo \
     regions \
+    reproject \
     ripgrep \
     rubin-nights \
     rubin-scheduler \
@@ -85,21 +87,12 @@ conda install -y --no-update-deps \
     wget \
     xarray
 
-# Structlog is a dependency of lsst-rsp.
-
-conda install -y --no-update-deps structlog
-
 # To make life easier at USDF we are adding three T&S packages that are not
 # available from conda-forge.
 
 conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils
 
-# "--no-build-isolation" means we're also responsible for the dependencies
-# not already provided by something in the conda env.  In this case,
-# symbolicmode from lsst-rsp.
-uv pip install --no-build-isolation \
-    'lsst-rsp>=0.7.1' \
-    'symbolicmode<3'
+# If anything must be installed via pip, do it here.  Ideally, nothing is.
 
 # Clean caches
 conda clean -a -y -f
