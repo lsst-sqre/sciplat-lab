@@ -41,9 +41,11 @@ set -e
 conda install -y --no-update-deps structlog
 
 # To make life easier at USDF we are adding three T&S packages that are not
-# available from conda-forge.
+# available from conda-forge (grandfathered).
+# ts-ofc: RFC-1162
 
-conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils
+conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils \
+      ts-ofc
 
 # Try lsdb separately, do *not* say "--no-build-isolation" or
 # "--no-update-deps"because we may need to pull in a newer pyarrow.
