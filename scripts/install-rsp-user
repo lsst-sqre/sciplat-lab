@@ -11,11 +11,8 @@ export SHELL
 MAMBA_ROOT_PREFIX="/opt/lsst/software/stack/conda"
 export MAMBA_ROOT_PREFIX
 
-# Never allow the installation to upgrade rubin_env.  Generally enforcing
-# the pin is only needed for releases, where the current version may have
-# moved ahead.
-
-# mamba is ... going away in September 2025.
+# mamba went away in September 2025 but rebuilds of old containers might
+# have 
 profdir=$stackdir/conda/etc/profile.d
 if [ -f $profdir/mamba.sh ]; then
     mv $profdir/mamba.sh $profdir/mamba.sh.save
@@ -23,10 +20,19 @@ fi
 
 source $stackdir/loadLSST.bash
 
+# Never allow the installation to upgrade rubin-env.  Generally enforcing
+# the pin is only needed for releases, where the current version may have
+# moved ahead.
+#
+# This creates problems, in that we may want to upgrade rubin-env-rsp
+# packages without rubin-env, but they're built from the same feedstock.
+#
+# Separating the feedstocks could be the answer, although at that point
+# I think dependency resolution is going to get a lot more fragile, because
+# there's quite a bit of coupling between rubin-env and rubin-env-rsp.
+
 rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 
-# Refactor of rubin-env-rsp coming later to separate user packages from
-# Lab environment packages.
 set +e
 conda install -y --no-update-deps "rubin-env-rsp==${rubin_env_ver}"
 rc=$?
@@ -36,19 +42,26 @@ if [ ${rc} -ne 0 ]; then
 fi
 set -e
 
-# Structlog is a dependency of lsst-rsp.
-
-conda install -y --no-update-deps structlog
-
-# To make life easier at USDF we are adding three T&S packages that are not
-# available from conda-forge (grandfathered).
+# To make life easier at USDF we are adding three T&S packages
+# (ts-m1m3-utils, ts-salobj, and ts-utils) that are not available from
+# conda-forge (decision grandfathered from pre-RFC-required-for-sciplat-lab
+# changes).
 # ts-ofc: RFC-1162
+#
+# It might be worth asking, since we are putting these in all the images,
+# whether T&S *could* put its public packages on conda-forge, in which case
+# we could just add them to rubin-env-rsp and not have to do this as its
+# own step.
+#
+# Our ideal scenario is to just have rubin-env and rubin-env-rsp, and that's
+# it.
 
 conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils \
       ts-ofc
 
 # Try lsdb separately, do *not* say "--no-build-isolation" or
 # "--no-update-deps"because we may need to pull in a newer pyarrow.
+# This is pretty dangerous, but I haven't found a better way to do it.
 #
 # It went into rubin-env-rsp in rubin-env 11, but we might need to rebuild an
 # earlier image (e.g. 29.2.0).  Remove this after we're done with the 29.x.x
@@ -56,29 +69,60 @@ conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils \
 #
 # Note that lsdb 0.6.4 is the version that is compatible with the rest of
 # rubin-env 11, paired with hats 0.6.4.  That also needs cdshealpix 0.7.1.
+#
+# Do the same with reproject, which CST wants in a 29.x.x image, and with
+# lsst-rsp, which is now conda packaged but, again, was not in rubin-env 10.
+#
+# This is all pretty janky and feels like it's going to create a rolling
+# window of tech debt.
+#
+# The need to support old releases and have reasonable reproducibility of
+# any particular release and CST's desire to add new features to old
+# releases at will are kind of incompatible.
 
-have_lsdb=$(conda list --export | grep lsdb) || /bin/true
+conda_list=$(conda list --export)
+
+have_lsdb=$(echo "${conda_list}" | grep lsdb) || /bin/true
 if [ -z "${have_lsdb}" ]; then
     echo "Doing separate installation of lsdb/hats 0.6.4"
     conda install -y lsdb=0.6.4 hats=0.6.4 cdshealpix=0.7.1
 fi
 
-# "--no-build-isolation" means we're also responsible for the dependencies
-# not already provided by something in the conda env.  In this case,
-# symbolicmode from lsst-rsp.
-uv pip install --no-build-isolation \
-    'lsst-rsp>=0.7.1' \
-    'symbolicmode<3' \
-    'jupyter_firefly_extensions>=0.15.0'
+have_reproject=$(echo "${conda_list}" | grep reproject) || /bin/true
+if [ -z "${have_reproject}" ]; then
+    echo "Doing separate installation of reproject"
+    conda install -y --no-update-deps reproject=0.19.0
+fi
+
+have_lsst_rsp=$(echo "${conda_list}" | grep lsst-rsp) || /bin/true
+if [ -z "${have_lsst_rsp}" ]; then
+    echo "Doing separate installation of lsst-rsp and structlog"
+    conda install -y --no-update-deps lsst-rsp=0.12.0 structlog=25.5.0
+fi
+
+# If we must install pip packages, do it here, but that turns into a
+# dependency hell nightmare, and we really, really would prefer not to.
 
 # Clean caches
 conda clean -a -y -f
 uv cache clean
 
-# Turn off console in UI python.
+# Turn off console in UI python. This was per Frossie request; it causes
+# some errors in the startup logs. I also don't understand why you would
+# want the console rather than just a scratch notebook where you just keep
+# re-executing cells, but apparently some people really want a REPL loop
+# outside of a notebook.
 source /usr/local/share/jupyterlab/venv/bin/activate
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
 
 # Add spellchecker to UI python
+#
+# This is a bizarre package with some really strange design decisions, and
+# we really don't want it in the generic base layer, which is why we're
+# doing it here.  It's included by CST request, and as with the tutorials
+# landing page, it would be nice if some day we could convince them otherwise.
+#
+# At least, unlike the landing page (at this point) disabling it is under
+# user control.
 uv pip install jupyterlab-spellchecker
