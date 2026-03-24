@@ -64,17 +64,20 @@ conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils \
 # This is pretty dangerous, but I haven't found a better way to do it.
 #
 # It went into rubin-env-rsp in rubin-env 11, but we might need to rebuild an
-# earlier image (e.g. 29.2.0).  Remove this after we're done with the 29.x.x
-# series.
+# earlier image (e.g. 29.2.0, which uses rubin-env 10).  Remove this after
+# we're done with the 29.x.x series.
 #
 # Note that lsdb 0.6.4 is the version that is compatible with the rest of
-# rubin-env 11, paired with hats 0.6.4.  That also needs cdshealpix 0.7.1.
+# rubin-env 10, paired with hats 0.6.4.  That also needs cdshealpix 0.7.1.
 #
 # Do the same with reproject, which CST wants in a 29.x.x image, and with
 # lsst-rsp, which is now conda packaged but, again, was not in rubin-env 10.
 #
 # This is all pretty janky and feels like it's going to create a rolling
-# window of tech debt.
+# window of tech debt.  In fact, you could conceptualize all of this
+# conditional installation as the balloon of tech debt which deflates with
+# each new release/recommended cycle, but which then reinflates over its
+# lifespan.
 #
 # The need to support old releases and have reasonable reproducibility of
 # any particular release and CST's desire to add new features to old
