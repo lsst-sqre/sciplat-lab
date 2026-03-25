@@ -97,10 +97,12 @@ if [ -z "${have_reproject}" ]; then
     conda install -y --no-update-deps reproject=0.19.0
 fi
 
+# We've RFCed removing lsst-rsp from rubin-env-rsp (RFC 1167) so we will
+# keep this one.
 have_lsst_rsp=$(echo "${conda_list}" | grep lsst-rsp) || /bin/true
 if [ -z "${have_lsst_rsp}" ]; then
-    echo "Doing separate installation of lsst-rsp and structlog"
-    conda install -y --no-update-deps lsst-rsp=0.12.0 structlog=25.5.0
+    echo "Doing separate installation of lsst-rsp"
+    conda install -y --no-update-deps lsst-rsp=0.12.0
 fi
 
 # If we must install pip packages, do it here, but that turns into a
