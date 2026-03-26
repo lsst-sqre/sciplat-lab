@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'EUPS tag of input DM Pipelines Stack container'
+        description: 'EUPS tag of input DM Pipelines Stack container, e.g. "w_2026_14", "v29_2_0"'
         required: true
       supplementary:
         description: 'Supplementary tag for experimental builds; yields output tag exp_tag_supplementary'
