@@ -51,7 +51,7 @@ du -sm
 # Do this the hard way
 find ${EUPS_PATH} -type f -name "*.so" -print0 | \
     xargs -0 strip -p --strip-unneeded || /bin/true
-exes=find ${EUPS_PATH} -type f -executable -print0 | \
+find ${EUPS_PATH} -type f -executable -print0 | \
     xargs -0 strip -p --strip-unneeded || /bin/true
 echo "Post-cleanup ${stackdir} size:"
 du -sm ${stackdir}
