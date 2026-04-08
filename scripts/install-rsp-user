@@ -98,12 +98,11 @@ if [ -z "${have_reproject}" ]; then
 fi
 
 # We've RFCed removing lsst-rsp from rubin-env-rsp (RFC 1167) so we will
-# keep this one.
-have_lsst_rsp=$(echo "${conda_list}" | grep lsst-rsp) || /bin/true
-if [ -z "${have_lsst_rsp}" ]; then
-    echo "Doing separate installation of lsst-rsp"
-    conda install -y --no-update-deps lsst-rsp=0.12.0
-fi
+# keep this one.  We let the version float because the whole point of
+# removing it from rubin-env-rsp was to be able to advance it faster than
+# packages in rubin-env-rsp.
+echo "Doing separate installation of lsst-rsp"
+conda install -y --upgrade --no-update-deps lsst-rsp
 
 # If we must install pip packages, do it here, but that turns into a
 # dependency hell nightmare, and we really, really would prefer not to.
