@@ -59,9 +59,7 @@ set -e
 conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils \
       ts-ofc
 
-# Try lsdb separately, do *not* say "--no-build-isolation" or
-# "--no-update-deps"because we may need to pull in a newer pyarrow.
-# This is pretty dangerous, but I haven't found a better way to do it.
+# Try lsdb separately.
 #
 # It went into rubin-env-rsp in rubin-env 11, but we might need to rebuild an
 # earlier image (e.g. 29.2.0, which uses rubin-env 10).  Remove this after
@@ -88,7 +86,7 @@ conda_list=$(conda list --export)
 have_lsdb=$(echo "${conda_list}" | grep lsdb) || /bin/true
 if [ -z "${have_lsdb}" ]; then
     echo "Doing separate installation of lsdb/hats 0.6.4"
-    conda install -y lsdb=0.6.4 hats=0.6.4 cdshealpix=0.7.1
+    conda install -y --no-update-deps lsdb=0.6.4 hats=0.6.4 cdshealpix=0.7.1
 fi
 
 have_reproject=$(echo "${conda_list}" | grep reproject) || /bin/true
@@ -99,11 +97,11 @@ fi
 
 # We've RFCed removing lsst-rsp from rubin-env-rsp (RFC 1167) so we will
 # keep this one.
-have_lsst_rsp=$(echo "${conda_list}" | grep lsst-rsp) || /bin/true
-if [ -z "${have_lsst_rsp}" ]; then
-    echo "Doing separate installation of lsst-rsp"
-    conda install -y --no-update-deps lsst-rsp=0.12.0
-fi
+#
+# In the case of this particular package, we actually do want the most recent
+# version.
+echo "Doing separate installation of lsst-rsp"
+conda install -y --no-update-deps lsst-rsp
 
 # If we must install pip packages, do it here, but that turns into a
 # dependency hell nightmare, and we really, really would prefer not to.
