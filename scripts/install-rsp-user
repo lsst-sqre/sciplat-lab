@@ -12,7 +12,7 @@ MAMBA_ROOT_PREFIX="/opt/lsst/software/stack/conda"
 export MAMBA_ROOT_PREFIX
 
 # mamba went away in September 2025 but rebuilds of old containers might
-# have 
+# still be using it
 profdir=$stackdir/conda/etc/profile.d
 if [ -f $profdir/mamba.sh ]; then
     mv $profdir/mamba.sh $profdir/mamba.sh.save
@@ -95,16 +95,16 @@ if [ -z "${have_reproject}" ]; then
     conda install -y --no-update-deps reproject=0.19.0
 fi
 
-# We've RFCed removing lsst-rsp from rubin-env-rsp (RFC 1167) so we will
-# keep this one.
-#
-# In the case of this particular package, we actually do want the most recent
-# version.
-echo "Doing separate installation of lsst-rsp"
-conda install -y --no-update-deps lsst-rsp
 
 # If we must install pip packages, do it here, but that turns into a
 # dependency hell nightmare, and we really, really would prefer not to.
+
+# We've removed lsst-rsp from rubin-env-rsp (RFC 1167).
+# In the case of this particular package, we actually do want the most recent
+# version, and we want to iterate it much faster than the stack release
+# cadence, hence the separate installation.
+echo "Doing separate installation of lsst-rsp"
+conda install -y --no-update-deps lsst-rsp
 
 # Clean caches
 conda clean -a -y -f

@@ -10,8 +10,8 @@ WORKDIR /tmp/build
 
 # An /etc/passwd and /etc/group
 
-COPY etc/passwd /etc/passwd
-COPY etc/group  /etc/group
+COPY static/etc/passwd /etc/passwd
+COPY static/etc/group  /etc/group
 RUN grpconv && pwconv
 
 COPY scripts/install-system-packages /tmp/build
@@ -21,8 +21,8 @@ RUN ./install-system-packages
 
 RUN mkdir -p /etc/profile.d
 
-COPY profile.d/local06-showrspnotice.sh \
-     profile.d/local07-setupstack.sh \
+COPY static/etc/profile.d/local06-showrspnotice.sh \
+     static/etc/profile.d/local07-setupstack.sh \
      /etc/profile.d/
 
 # /etc/skel
@@ -31,14 +31,14 @@ RUN for i in WORK DATA notebooks ; do \
         mkdir -p /etc/skel/${i} ; \
     done
 
-COPY skel/gitconfig /etc/skel/.gitconfig
-COPY skel/git-credentials /etc/skel/.git-credentials
-COPY skel/user_setups /etc/skel/notebooks/.user_setups
+COPY static/etc/skel/gitconfig /etc/skel/.gitconfig
+COPY static/etc/skel/git-credentials /etc/skel/.git-credentials
+COPY static/etc/skel/user_setups /etc/skel/notebooks/.user_setups
 
-COPY runtime/lsst_kernel.json \
+COPY static/runtime/lsst_kernel.json \
        /usr/local/share/jupyter/kernels/lsst/kernel.json
 
-COPY etc/rsp_notice /usr/local/etc
+COPY static/etc/rsp_notice /usr/local/etc
 
 # Add the DM stack.
 
@@ -48,11 +48,11 @@ ARG tag
 COPY scripts/install-dm-stack /tmp/build
 RUN ./install-dm-stack ${tag}
 
-COPY etc/rsp_notice etc/20-logging.py \
+COPY static/etc/rsp_notice static/etc/20-logging.py \
      /usr/local/share/jupyterlab/etc/
 
-COPY runtime/lsst_kernel.json \
-    runtime/lsstlaunch.bash /usr/local/share/jupyterlab/
+COPY static/runtime/lsst_kernel.json \
+     static/runtime/lsstlaunch.bash /usr/local/share/jupyterlab/
 
 COPY scripts/install-rsp-user /tmp/build
 RUN ./install-rsp-user
@@ -92,9 +92,10 @@ RUN rm ./cleanup-files
 USER 65534:65534
 WORKDIR /tmp
 
+# This command is provided by the base container.
 CMD ["/usr/local/share/jupyterlab/runlab"]
 
-# Overwrite Stack Container definitions with more-accurate-for-us ones
+# Overwrite Base Container definitions with more-accurate-for-us ones
 ENV  DESCRIPTION="Rubin Science Platform Notebook Aspect"
 ENV  SUMMARY="Rubin Science Platform Notebook Aspect"
 
