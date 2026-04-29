@@ -95,16 +95,24 @@ if [ -z "${have_reproject}" ]; then
     conda install -y --no-update-deps reproject=0.19.0
 fi
 
-# We've RFCed removing lsst-rsp from rubin-env-rsp (RFC 1167) so we will
-# keep this one.
-#
-# In the case of this particular package, we actually do want the most recent
-# version.
+# Not yet in rubin-env-rsp.
+
+conda install -y --no-update-deps jupyter-ai jupyter-ai-magic-commands \
+      anthropic
+
+# We have removed lsst-rsp from rubin-env-rsp (RFC 1167) so we will keep
+# this one. We expect to be evolving it much more quickly than the rest
+# of the environment.
 echo "Doing separate installation of lsst-rsp"
 conda install -y --no-update-deps lsst-rsp
 
 # If we must install pip packages, do it here, but that turns into a
 # dependency hell nightmare, and we really, really would prefer not to.
+#
+# We will never merge this; the PR including it (from conda-forge) solves,
+# but we can't do a conda install as an afterburner.
+
+uv pip install jupyter-ai-litellm
 
 # Clean caches
 conda clean -a -y -f
