@@ -95,7 +95,6 @@ if [ -z "${have_reproject}" ]; then
     conda install -y --no-update-deps reproject=0.19.0
 fi
 
-
 # If we must install pip packages, do it here, but that turns into a
 # dependency hell nightmare, and we really, really would prefer not to.
 
