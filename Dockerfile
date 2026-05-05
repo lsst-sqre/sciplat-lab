@@ -56,6 +56,9 @@ COPY static/runtime/lsst_kernel.json \
 
 COPY scripts/install-rsp-user /tmp/build
 RUN ./install-rsp-user
+RUN mkdir -p /usr/local/etc/jupyter/labconfig
+COPY scripts/modify-settings.py /tmp/build
+RUN python3 modify-settings.py
 
 FROM base-stack-image AS compat-rsp-image
 
