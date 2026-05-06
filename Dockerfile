@@ -36,7 +36,9 @@ COPY static/etc/skel/git-credentials /etc/skel/.git-credentials
 COPY static/etc/skel/user_setups /etc/skel/notebooks/.user_setups
 
 COPY static/runtime/lsst_kernel.json \
-       /usr/local/share/jupyter/kernels/lsst/kernel.json
+    /usr/local/share/jupyter/kernels/lsst/kernel.json
+COPY static/runtime/lsst_logo.png \
+    /usr/local/share/jupyter/kernels/lsst/logo-64x64.png
 
 COPY static/etc/rsp_notice /usr/local/etc
 
