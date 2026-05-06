@@ -97,8 +97,8 @@ fi
 
 # Not yet in rubin-env-rsp.
 
-conda install -y --no-update-deps jupyter-ai jupyter-ai-magic-commands \
-      anthropic
+conda install -y --no-update-deps anthropic jupyter-ai \
+      jupyter-ai-magic-commands
 
 # We have removed lsst-rsp from rubin-env-rsp (RFC 1167) so we will keep
 # this one. We expect to be evolving it much more quickly than the rest
@@ -109,10 +109,15 @@ conda install -y --no-update-deps lsst-rsp
 # If we must install pip packages, do it here, but that turns into a
 # dependency hell nightmare, and we really, really would prefer not to.
 #
-# We will never merge this; the PR including it (from conda-forge) solves,
-# but we can't do a conda install as an afterburner.
+# jupyter-ai-jupyternaut isn't even available on conda-forge.  I can ask
+# them to package it, though.  Conda is pretty popular in the data science
+# world.
+#
+# The PR including jupyter-ai-litellm (from conda-forge) solves,
+# but we can't do a conda install in this environment as an afterburner,
+# because the frozen dependency stuff gets in the way.
 
-uv pip install jupyter-ai-litellm
+uv pip install jupyter-ai-jupyternaut jupyter-ai-litellm
 
 # We've removed lsst-rsp from rubin-env-rsp (RFC 1167).
 # In the case of this particular package, we actually do want the most recent
