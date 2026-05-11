@@ -36,11 +36,11 @@ rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 set +e
 conda install -y --no-update-deps "rubin-env-rsp==${rubin_env_ver}"
 rc=$?
+set -e
 if [ ${rc} -ne 0 ]; then
     echo "Conda installation with --no-update-deps failed; retrying without"
     conda install -y "rubin-env-rsp==${rubin_env_ver}"
 fi
-set -e
 
 # To make life easier at USDF we are adding three T&S packages
 # (ts-m1m3-utils, ts-salobj, and ts-utils) that are not available from
