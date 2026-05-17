@@ -99,6 +99,13 @@ conda install -y --no-update-deps \
        'wget>=1.25.0' \
        'xarray>=2025.11.0'
 
+#
+# AI packages
+#
+conda install -y --no-update-deps anthropic jupyter-ai jupyter-ai-acp-client \
+      jupyter-ai-chat-commands jupyter-ai-jupyternaut jupyter-ai-litellm \
+      jupyter-ai-magic-commands juptyer-ai-persona-manager jupyter-ai-router \
+      jupyter-ai-tools
 
 # To make life easier at USDF we are adding three T&S packages
 # (ts-m1m3-utils, ts-salobj, and ts-utils) that are not available from
