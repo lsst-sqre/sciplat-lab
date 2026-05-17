@@ -55,6 +55,7 @@ COPY static/runtime/lsst_kernel.json \
      static/runtime/lsstlaunch.bash /usr/local/share/jupyterlab/
 
 COPY scripts/install-rsp-user /tmp/build
+COPY scripts/extract-rubin-env-rsp.py /tmp/build
 RUN ./install-rsp-user
 RUN mkdir -p /usr/local/etc/jupyter/labconfig
 COPY scripts/modify-settings.py /tmp/build

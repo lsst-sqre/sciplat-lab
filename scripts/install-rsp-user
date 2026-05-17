@@ -33,72 +33,22 @@ source $stackdir/loadLSST.bash
 
 rubin_env_ver=$(conda list rubin-env$ --json | jq -r '.[0].version')
 
-# set +e
-# conda install -y --no-update-deps "rubin-env-rsp==${rubin_env_ver}"
-# rc=$?
-# set -e
-# if [ ${rc} -ne 0 ]; then
-#    echo "Conda installation with --no-update-deps failed; retrying without"
-#    conda install -y "rubin-env-rsp==${rubin_env_ver}"
-# fi
-
-# Installing the components manually so we can tweak the recipe more easily.
-
-conda install -y --no-update-deps \
-       'awkward>=2.8.10' \
-       'awkward-pandas>=2023.8.0' \
-       'bokeh>=3.8.1' \
-       'bqplot>=0.12.45' \
-       'ciso8601>=2.3.3' \
-       'cloudpickle>=3.1.2' \
-       'dask-core>=2025.11.0' \
-       'datashader>=0.18.2' \
-       'fastparquet>=2024.11.0' \
-       'ffmpeg>=7.1.1' \
-       'freetype-py>=2.5.1' \
-       'geoviews>=1.15.0' \
-       'gh>=2.83.1' \
-       'ginga>=5.4.01' \
-       'graphicsmagick>=1.3.45' \
-       'hdf5plugin>=5.1.01' \
-       'holoviews>=1.21.01' \
-       'httpx>=0.28.1' \
-       'hvplot>=0.12.2' \
-       'intake>=2.0.8' \
-       'intake-parquet>=0.3.0' \
-       'ipympl>=0.10.0' \
-       'jedi>=0.19.2' \
-       'jupyter>=1.1.1' \
-       'lsdb>=0.6.7' \
-       'lsst-efd-client>=0.12.0' \
-       'mermaid-py>=0.8.0' \
-       'mysqlclient>=2.2.7' \
-       'nbval>=0.11.0' \
-       'panel>=1.8.3' \
-       'papermill>=2.6.0' \
-       'paramnb>=2.0.4' \
-       'partd>=1.4.2' \
-       'plotly>=6.5.0' \
-       'pre-commit>=4.4.0' \
-       'pypandoc>=1.16.2' \
-       'pyshp>=3.0.2' \
-       'python-snappy>=0.7.3' \
-       'python-socketio>=5.14.3' \
-       'pyvo>=1.8' \
-       'regions>=0.11' \
-       'reproject>=0.19.0' \
-       'ripgrep>=15.1.0' \
-       'rubin-nights>=0.8.1' \
-       'rubin-scheduler>=3.20.1' \
-       'rubin-sim>=2.6.0' \
-       'rubin.citsci>=0.9.2' \
-       'sbpy>=0.5.0' \
-       'schedview>=0.20.0' \
-       'snappy>=1.2.2' \
-       'toolz>=1.1.0' \
-       'wget>=1.25.0' \
-       'xarray>=2025.11.0'
-
+set +e
+conda install -y --no-update-deps "rubin-env-rsp==${rubin_env_ver}"
+rc=$?
+set -e
+if [ ${rc} -ne 0 ]; then
+    echo "Conda installation of pinned-rubin-env rubin-env-rsp failed."
+    echo "Trying with allowing floating dependencies."
+    conda install -y "rubin-env-rsp==${rubin_env_ver}"
+    rc=$?
+fi
+set -e
+if [ ${rc} -ne 0 ]; then
+    echo "Conda installation of rubin-env-rsp failed."
+    echo "Trying individual packages."
+    conda install -y --no-update-deps $(python3 extract-rubin-env-rsp.py)
+fi
 
 # To make life easier at USDF we are adding three T&S packages
 # (ts-m1m3-utils, ts-salobj, and ts-utils) that are not available from
