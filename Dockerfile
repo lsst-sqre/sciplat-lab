@@ -15,7 +15,7 @@ COPY static/etc/group  /etc/group
 RUN grpconv && pwconv
 
 COPY scripts/install-system-packages /tmp/build
-RUN ./install-system-packages
+RUN cd /tmp/build && ./install-system-packages  # profile cds to $HOME now
 
 # /etc/profile.d parts
 
@@ -48,7 +48,7 @@ FROM base-image AS base-stack-image
 ARG tag
 
 COPY scripts/install-dm-stack /tmp/build
-RUN ./install-dm-stack ${tag}
+RUN cd /tmp/build && ./install-dm-stack ${tag}
 
 COPY static/etc/rsp_notice static/etc/20-logging.py \
      /usr/local/share/jupyterlab/etc/
@@ -57,10 +57,10 @@ COPY static/runtime/lsst_kernel.json \
      static/runtime/lsstlaunch.bash /usr/local/share/jupyterlab/
 
 COPY scripts/install-rsp-user /tmp/build
-RUN ./install-rsp-user
+RUN cd /tmp/build &&  ./install-rsp-user
 RUN mkdir -p /usr/local/etc/jupyter/labconfig
 COPY scripts/modify-settings.py /tmp/build
-RUN python3 modify-settings.py
+RUN cd /tmp/build && python3 /tmp/build/modify-settings.py
 
 FROM base-stack-image AS compat-rsp-image
 
@@ -68,7 +68,7 @@ FROM base-stack-image AS compat-rsp-image
 # paths.
 
 COPY scripts/install-compat /tmp/build
-RUN ./install-compat
+RUN cd /tmp/build && ./install-compat
 
 FROM compat-rsp-image AS manifests-rsp-image
 
@@ -76,7 +76,7 @@ FROM compat-rsp-image AS manifests-rsp-image
 # "what broke this week?"
 
 COPY scripts/generate-versions /tmp/build
-RUN ./generate-versions
+RUN cd /tmp/build && ./generate-versions
 
 FROM manifests-rsp-image AS rsp-image
 ARG version
@@ -88,8 +88,8 @@ USER 0:0
 WORKDIR /
 
 COPY scripts/cleanup-files /
-RUN ./cleanup-files
-RUN rm ./cleanup-files
+RUN cd / && ./cleanup-files
+RUN cd / && rm ./cleanup-files
 
 # Run by default as an unprivileged user.  In real life, the Nublado
 # controller will set this correctly.  The default is conventionally
