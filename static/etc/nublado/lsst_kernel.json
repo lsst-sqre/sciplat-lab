@@ -2,7 +2,7 @@
  "display_name": "LSST",
  "language": "python",
  "argv": [
-    "/usr/local/share/jupyterlab/lsstlaunch.bash",
+    "/etc/nublado/lsstlaunch.bash",
     "{connection_file}"
  ]
 }

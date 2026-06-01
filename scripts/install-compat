@@ -3,14 +3,45 @@ set -x
 #
 # This is pretty minimal.  Effectively we just want to ensure that
 # files once found in the old-style layout still exist, but point to their
-# new equivalent.
+# new equivalents, so that new images will work with old machinery and
+# vice versa.
+
+# We are also moving from /usr/local/share/jupyterlab to /etc/nublado for
+# everything RSP-related, so we will create compatibility symlinks in
+# the former directory.  If our base container looks like an old-style one
+# we will instead create the links pointing the other way.
 
 set -euo pipefail
 
-cd /opt/lsst/software/jupyterlab
+if [ -e "/etc/nublado/venv" ]; then
+    # New-style container
+    realdir="/etc/nublado"
+    tgt="/usr/local/share/jupyterlab"
+else
+    # Old-style
+    realdir="/usr/local/share/jupyterlab"
+    tgt="/etc/nublado"
+fi    
 
-realdir="../../../../usr/local/share/jupyterlab"
-for file in lsst_kernel.json lsstlaunch.bash; do
-    ln -s "${realdir}/${file}"
+for d in ${tgt} /opt/lsst/software/jupyterlab; do
+    if ! [ -e ${d} ]; then
+	mkdir -p ${d}
+    fi
+    cd ${d}
+    for file in versions_installed lsst_kernel.json lsstlaunch.bash \
+				   20-logging.py rsp_notice ; do
+	# We may have some of these already from the base layer.
+	# If the file exists, leave it alone
+	if [ ! -e "${file}" ] && [ -e "${realdir}/${file}" ]; then
+	    ln -s "${realdir}/${file}"
+	fi
+	# And of course we put these in /usr/local/share/jupyterlab/etc
+	# for some reason.
+	if [ "${file}" == "20-logging.py" ] || \
+	       [ "${file}" == "rsp_notice" ]; then
+	    if [ -e "${realdir}/etc/${file}" ] && ! [ -e "${file}" ]; then
+		ln -s "${realdir}/etc/${file}"
+	    fi
+	fi
+    done
 done
-ln -s "${realdir}/etc/20-logging.py"

@@ -3,27 +3,30 @@ set -x
 
 set -eo pipefail  # -u and conda don't play well: ADDR2LINE: unbound variable
 
-# First system
+# Install-compat will have ensured this exists.  It might be a symlink.
+cd /etc/nublado/versions-installed
 
-vi_dir="/usr/local/share/jupyterlab/versions-installed"
-mkdir -p ${vi_dir}
-cd ${vi_dir}
-dpkg -l | tee "system-dpkgs"
-uv pip list | tee "system-python"
+# We add the "-sciplat" because we also have base packages here, and it is
+# possible we will overwrite some of them in sciplat-lab installation.
+
+# First system packages
+dpkg -l | tee "system-dpkgs-sciplat"
+uv pip list | tee "system-python-sciplat"
+npm list --global --long --json | tee "node-modules-sciplat"
 
 # Now JupyterLab python
 
-source /usr/local/share/jupyterlab/venv/bin/activate
-uv pip list | tee "jupyterlab-python"
-((jupyter labextension list 2>&1) | tee "lab-extensions") || /bin/true
+source /etc/nublado/venv/bin/activate
+cd ${vi_dir}
+uv pip list | tee "jupyterlab-python-sciplat"
+# If lab extensions do not load, we will get a nonzero return code.  Suppress.
+((jupyter labextension list 2>&1) | tee "lab-extensions-sciplat") || /bin/true
 deactivate
 
-# Now the stack
+# Finally, the stack
 SHELL=bash
 export SHELL
-vi_dir="/opt/lsst/software/jupyterlab/versions-installed"
 source /opt/lsst/software/stack/loadLSST.bash
-mkdir -p ${vi_dir}
 cd ${vi_dir}
-conda env export | tee conda-stack.yaml
+conda env export | tee "conda-stack.yaml"
 

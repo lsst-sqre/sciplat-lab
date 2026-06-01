@@ -8,7 +8,7 @@ for f in passwd group shadow gshadow; do
 done
 
 # Copy logos across
-JLV=/usr/local/share/jupyterlab/venv
+JLV=/etc/nublado/venv
 cp ${JLV}/share/jupyter/kernels/python3/logo* \
    /usr/local/share/jupyter/kernels/lsst
 

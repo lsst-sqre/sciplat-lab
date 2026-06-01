@@ -122,7 +122,13 @@ uv cache clean
 # want the console rather than just a scratch notebook where you just keep
 # re-executing cells, but apparently some people really want a REPL loop
 # outside of a notebook.
-source /usr/local/share/jupyterlab/venv/bin/activate
+
+# Try newer location first, then try older one.
+venv=/etc/nublado/venv
+if ! [ -d "${venv}" ]; then
+    venv=/usr/local/share/jupyterlab/venv
+fi
+source ${venv}/bin/activate
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
 

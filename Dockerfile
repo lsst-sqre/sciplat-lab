@@ -36,10 +36,9 @@ COPY static/etc/skel/gitconfig /etc/skel/.gitconfig
 COPY static/etc/skel/git-credentials /etc/skel/.git-credentials
 COPY static/etc/skel/user_setups /etc/skel/notebooks/.user_setups
 
-COPY static/runtime/lsst_kernel.json \
+# This goes onto a Jupyter path, which is *not* /etc/nublado.
+COPY static/etc/nublado/lsst_kernel.json \
        /usr/local/share/jupyter/kernels/lsst/kernel.json
-
-COPY static/etc/rsp_notice /usr/local/etc
 
 # Add the DM stack.
 
@@ -49,11 +48,9 @@ ARG tag
 COPY scripts/install-dm-stack /tmp/build
 RUN cd /tmp/build && ./install-dm-stack ${tag}
 
-COPY static/etc/rsp_notice static/etc/20-logging.py \
-     /usr/local/share/jupyterlab/etc/
-
-COPY static/runtime/lsst_kernel.json \
-     static/runtime/lsstlaunch.bash /usr/local/share/jupyterlab/
+COPY static/etc/nublado/rsp_notice static/etc/nublado/20-logging.py \
+     static/etc/nublado/lsst_kernel.json static/etc/nublado/lsstlaunch.bash \
+     /etc/nublado
 
 COPY scripts/install-rsp-user /tmp/build
 COPY scripts/extract-rubin-env-rsp.py /tmp/build
@@ -97,7 +94,7 @@ USER 65534:65534
 WORKDIR /tmp
 
 # This command is provided by the base container.
-CMD ["/usr/local/share/jupyterlab/runlab"]
+CMD ["/etc/nublado/runlab"]
 
 # Overwrite Base Container definitions with more-accurate-for-us ones
 ENV  DESCRIPTION="Rubin Science Platform Notebook Aspect"
