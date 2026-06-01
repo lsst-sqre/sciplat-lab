@@ -25,7 +25,7 @@ uv pip tree | tee "sciplat-jupyterlab-python-tree"
 ((jupyter labextension list 2>&1) | tee "sciplat-lab-extensions") || /bin/true
 deactivate
 
-# Now the stack
+# Finally, the stack
 SHELL=bash
 export SHELL
 source /opt/lsst/software/stack/loadLSST.bash

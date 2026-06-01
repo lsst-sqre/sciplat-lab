@@ -3,11 +3,25 @@ set -x
 #
 # This is pretty minimal.  Effectively we just want to ensure that
 # files once found in the old-style layout still exist, but point to their
-# new equivalent.
+# new equivalents, so that new images will work with old machinery and
+# vice versa.
+
+# We are also moving from /usr/local/share/jupyterlab to /etc/nublado for
+# everything RSP-related, so we will create compatibility symlinks in
+# the former directory.  If our base container looks like an old-style one
+# we will instead create the links pointing the other way.
 
 set -euo pipefail
 
-cd /opt/lsst/software/jupyterlab
+if [ -e "/etc/nublado/venv" ]; then
+    # New-style container
+    realdir="/etc/nublado"
+    tgt="/usr/local/share/jupyterlab"
+else
+    # Old-style
+    realdir="/usr/local/share/jupyterlab"
+    tgt="/etc/nublado"
+fi    
 
 realdir="../../../../usr/local/share/jupyterlab"
 for file in lsst_kernel.json lsstlaunch.bash runlab versions-installed; do
@@ -32,4 +46,3 @@ done
 for file in 20-logging.py rsp_notice; do
     ln -s ${realdir}/etc/${file}
 done
-

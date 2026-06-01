@@ -1,6 +1,6 @@
 #!/bin/sh
 
-etc="/usr/local/share/jupyterlab/etc"
+etc="/etc/nublado"
 
 site_recommendation () {
     cat << EOF
