@@ -10,7 +10,26 @@ set -euo pipefail
 cd /opt/lsst/software/jupyterlab
 
 realdir="../../../../usr/local/share/jupyterlab"
-for file in lsst_kernel.json lsstlaunch.bash; do
+for file in lsst_kernel.json lsstlaunch.bash runlab versions-installed; do
     ln -s "${realdir}/${file}"
 done
 ln -s "${realdir}/etc/20-logging.py"
+
+# We are also preparing to abandon /usr/local/share/jupyterlab and put
+# everything under /etc/nublado, so we will start by creating symlinks.
+#
+# Eventually, the symlinks will go the other way, and then disappear
+# entirely.
+
+if ! [ -d /etc/nublado ]; then
+    mkdir /etc/nublado  # Apparently we just synthesized it from the mounts
+fi
+cd /etc/nublado
+realdir="../../usr/local/share/jupyterlab"  # Relative to /etc/nublado
+for file in lsst_kernel.json lsstlaunch.bash versions-installed venv; do
+    ln -s ${realdir}/${file}
+done
+for file in 20-logging.py rsp_notice; do
+    ln -s ${realdir}/etc/${file}
+done
+

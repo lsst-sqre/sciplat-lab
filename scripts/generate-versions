@@ -3,27 +3,26 @@ set -x
 
 set -eo pipefail  # -u and conda don't play well: ADDR2LINE: unbound variable
 
-# First system
+# First system; we prepend sciplat- so we can see what (if anything) changed
+# between the base container and this one.
 
 vi_dir="/usr/local/share/jupyterlab/versions-installed"
 mkdir -p ${vi_dir}
 cd ${vi_dir}
-dpkg -l | tee "system-dpkgs"
-uv pip list | tee "system-python"
+dpkg -l | tee "sciplat-system-dpkgs"
+uv pip list | tee "sciplat-system-python"
+npm list --global --long --json | tee "sciplat-node-modules"
 
 # Now JupyterLab python
 
 source /usr/local/share/jupyterlab/venv/bin/activate
-uv pip list | tee "jupyterlab-python"
-((jupyter labextension list 2>&1) | tee "lab-extensions") || /bin/true
+uv pip list | tee "sciplat-jupyterlab-python"
+((jupyter labextension list 2>&1) | tee "sciplat-lab-extensions") || /bin/true
 deactivate
 
 # Now the stack
 SHELL=bash
 export SHELL
-vi_dir="/opt/lsst/software/jupyterlab/versions-installed"
 source /opt/lsst/software/stack/loadLSST.bash
-mkdir -p ${vi_dir}
-cd ${vi_dir}
-conda env export | tee conda-stack.yaml
+conda env export | tee sciplat-conda-stack.yaml
 
