@@ -117,6 +117,9 @@ conda install -y --no-update-deps lsst-rsp
 conda clean -a -y -f
 uv cache clean
 
+# We're done with conda; turn set -x back on.
+set -x
+
 # Turn off console in UI python. This was per Frossie request; it causes
 # some errors in the startup logs. I also don't understand why you would
 # want the console rather than just a scratch notebook where you just keep
@@ -125,6 +128,15 @@ uv cache clean
 source /usr/local/share/jupyterlab/venv/bin/activate
 jupyter labextension disable @jupyterlab/console-extension
 jupyter labextension lock @jupyterlab/console-extension
+
+# Jupyterlab-variableinspector hasn't worked with Jupyterlab 4, and it
+# may be causing kernel hangs.  We want to remove it from the base container,
+# but until we do, disable it.  Guard it so once it has disappeared, the
+# build doesn't break.
+
+v_insp="@lckr/jupyterlab_variableinspector"
+jupyter labextension disable ${v_insp} || /bin/true
+jupyter labextension lock ${v_insp} || /bin/true
 
 # Add spellchecker to UI python
 #
