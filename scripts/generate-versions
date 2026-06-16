@@ -11,7 +11,9 @@ mkdir -p ${vi_dir}
 cd ${vi_dir}
 dpkg -l | tee "sciplat-system-dpkgs"
 uv pip list | tee "sciplat-system-python"
-npm list --global --long --json | tee "sciplat-node-modules"
+if (which npm); then
+    npm list --global --long --json | tee "sciplat-node-modules"
+fi
 
 # Now JupyterLab python
 
