@@ -148,3 +148,7 @@ jupyter labextension lock ${v_insp} || /bin/true
 # At least, unlike the landing page (at this point) disabling it is under
 # user control.
 uv pip install jupyterlab-spellchecker
+
+# Install branch rje
+uv pip install git+https://github.com/lsst-sqre/rsp-jupyter-extensions@tickets/DM-55155
+
