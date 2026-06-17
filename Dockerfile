@@ -14,6 +14,17 @@ COPY static/etc/passwd /etc/passwd
 COPY static/etc/group  /etc/group
 RUN grpconv && pwconv
 
+# Add Tini for proper reaping and signal forwarding.
+# This should move into jupyterlab-base in the future.
+
+ENV TINI_VERSION=v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini \
+    /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "--"]
+
+# Back to the rest of the build
+
 COPY scripts/install-system-packages /tmp/build
 # profile.d now means we always start in ${HOME}.
 RUN cd /tmp/build && ./install-system-packages
