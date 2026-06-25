@@ -22,7 +22,7 @@ input_tag_to_version() {
 }
 
 calculate_tags() {
-    if [ -z "${tag}" ] || [ -z "${image}" || [ -z "${input}" ]; then
+    if [ -z "${tag}" ] || ( [ -z "${image}" || [ -z "${input}" ] ); then
         echo "required variables: tag, image, input" >&2
         exit 1
     fi
