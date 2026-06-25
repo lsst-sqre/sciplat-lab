@@ -22,8 +22,8 @@ input_tag_to_version() {
 }
 
 calculate_tags() {
-    if [ -z "${tag}" ] || [ -z "${image}" ]; then
-        echo "required variables: tag, image" >&2
+    if [ -z "${tag}" ] || [ -z "${image}" || [ -z "${input}" ]; then
+        echo "required variables: tag, image, input" >&2
         exit 1
     fi
 
@@ -39,17 +39,33 @@ calculate_tags() {
     release_branch="main"
 
     version=$(input_tag_to_version)
-    if [ "${branch}" != "${release_branch}" ]; then
+    input_tag=$(echo "${input}" | cut -d ':' -f 2)
+    tag_type=$(echo ${version} | cut -c 1)    
+    if [ "${branch}" != "${release_branch}" ] || \
+	   ( [ "${input_tag}" != "latest" ] && [ "${tag_type}" != "r" ] ); then
+
+	# This is correct: we do allow building *releases* from different
+	# input tags, because they have a unique build number and thus
+	# will not overwrite earlier versions, and it may be necessary to
+	# rebuild a release with the jupyterlab-base version current at the
+	# original build time.
+
+	discriminator="${branch}"
+	if [ "${input_tag}" != "latest" ]; then
+	    discriminator="${input_tag}"
+	fi
         if [ -z "${supplementary}" ]; then
-            supplementary=$( echo ${branch} | tr -c -d \[A-z\]\[0-9\] )
+            supplementary=$( echo ${discriminator} | tr -c -d \[A-z\]\[0-9\] )
         fi
     fi
     if [ -n "${supplementary}" ] && \
            [ "${OVERRIDE_BRANCH}" != "${release_branch}" ]; then
         version="exp_${version}_${supplementary}"
     fi
-    tag_type=$(echo ${version} | cut -c 1)
 
+    # Recalculate tag, because we might have just forced an experimental.
+    tag_type=$(echo ${version} | cut -c 1)
+    
     # Experimentals do not get tagged as latest anything.  Dailies,
     #  weeklies, and releases get tagged as latest_<category>.  The
     #  "latest" tag for the lab container should always point to the
