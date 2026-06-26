@@ -36,6 +36,7 @@ RUN mkdir -p /etc/profile.d
 COPY static/etc/profile.d/local07-showrspnotice.sh \
      static/etc/profile.d/local08-setupstack.sh \
      static/etc/profile.d/local09-umask.sh \
+     static/etc/profile.d/local10-collab.sh \
      /etc/profile.d/
 
 # /etc/skel
