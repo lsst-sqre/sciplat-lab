@@ -55,6 +55,7 @@ fi
 # conda-forge (decision grandfathered from pre-RFC-required-for-sciplat-lab
 # changes).
 # ts-ofc: RFC-1162
+# ts-config-mttcs: no RFC, Frossie directive 14 July 2026.
 #
 # It might be worth asking, since we are putting these in all the images,
 # whether T&S *could* put its public packages on conda-forge, in which case
@@ -63,9 +64,12 @@ fi
 #
 # Our ideal scenario is to just have rubin-env and rubin-env-rsp, and that's
 # it.
+#
+# On the other hand, as this keeps growing, maybe T&S should add these packages
+# and USDF should just run the T&S flavor of sciplat-lab.
 
 conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils \
-      ts-ofc
+      ts-ofc ts-config-mttcs
 
 # Try lsdb separately.
 #
