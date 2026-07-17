@@ -27,7 +27,7 @@ calculate_tags() {
         exit 1
     fi
 
-    branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || /bin/true )
+    branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true )
     if [ -n "${OVERRIDE_BRANCH}" ]; then
         branch="${OVERRIDE_BRANCH}"
     fi
@@ -42,18 +42,18 @@ calculate_tags() {
     input_tag=$(echo "${input}" | cut -d ':' -f 2)
     tag_type=$(echo ${version} | cut -c 1)    
     if [ "${branch}" != "${release_branch}" ] || \
-	   ( [ "${input_tag}" != "latest" ] && [ "${tag_type}" != "r" ] ); then
+           ( [ "${input_tag}" != "latest" ] && [ "${tag_type}" != "r" ] ); then
 
-	# This is correct: we do allow building *releases* from different
-	# input tags, because they have a unique build number and thus
-	# will not overwrite earlier versions, and it may be necessary to
-	# rebuild a release with the jupyterlab-base version current at the
-	# original build time.
+        # This is correct: we do allow building *releases* from different
+        # input tags, because they have a unique build number and thus
+        # will not overwrite earlier versions, and it may be necessary to
+        # rebuild a release with the jupyterlab-base version current at the
+        # original build time.
 
-	discriminator="${branch}"
-	if [ "${input_tag}" != "latest" ]; then
-	    discriminator="${input_tag}"
-	fi
+        discriminator="${branch}"
+        if [ "${input_tag}" != "latest" ]; then
+            discriminator="${input_tag}"
+        fi
         if [ -z "${supplementary}" ]; then
             supplementary=$( echo ${discriminator} | tr -c -d \[A-z\]\[0-9\] )
         fi
@@ -80,8 +80,12 @@ calculate_tags() {
             latest="latest"
             ;;
         "r")
-            ltype="latest_release"
-            latest="latest"
+            echo ${version} | grep -q "rc"
+            rc=$?
+            if [ ${rc} != 0 ]; then
+                ltype="latest_release"
+                latest="latest"
+            fi
             ;;
         "d")
             ltype="latest_daily"
