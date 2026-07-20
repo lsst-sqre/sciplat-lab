@@ -34,3 +34,8 @@ conda env export | tee sciplat-conda-stack.yaml
 if ! (which conda tree --full > sciplat-conda-stack-tree); then
     rm -f sciplat-conda-stack-tree
 fi
+
+# Add the tutorials as they existed when the container was built.
+cd /etc/nublado
+git clone --depth 1 "https://github.com/lsst/tutorial-notebooks" -b main \
+    tutorial-notebooks-at-build-time
