@@ -28,3 +28,7 @@ export SHELL
 source /opt/lsst/software/stack/loadLSST.bash
 conda env export | tee sciplat-conda-stack.yaml
 
+# Add the tutorials as they existed when the container was built.
+cd /etc/nublado
+git clone --depth 1 "https://github.com/lsst/tutorial-notebooks" -b main \
+    tutorial-notebooks-at-build-time
