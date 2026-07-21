@@ -29,4 +29,4 @@ SHELL=bash
 export SHELL
 source /opt/lsst/software/stack/loadLSST.bash
 conda env export | tee sciplat-conda-stack.yaml
-conda-tree deptree --full | tee "sciplat-conda-stack-tree"
+uv pip tree | tee "sciplat-conda-stack-tree"

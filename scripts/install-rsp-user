@@ -113,9 +113,6 @@ fi
 echo "Doing separate installation of lsst-rsp"
 conda install -y --no-update-deps lsst-rsp
 
-# Install conda-tree for conda dependency graph.
-conda install -y --no-update-deps conda-tree
-
 # Clean caches
 conda clean -a -y -f
 uv cache clean
