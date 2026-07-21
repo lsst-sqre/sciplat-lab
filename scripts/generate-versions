@@ -14,11 +14,13 @@ uv pip list | tee "sciplat-system-python"
 if (which npm); then
     npm list --global --long --json | tee "sciplat-node-modules"
 fi
+uv pip tree | tee "sciplat-system-python-tree"
 
 # Now JupyterLab python
 
 source /usr/local/share/jupyterlab/venv/bin/activate
 uv pip list | tee "sciplat-jupyterlab-python"
+uv pip tree | tee "sciplat-jupyterlab-python-tree"
 ((jupyter labextension list 2>&1) | tee "sciplat-lab-extensions") || /bin/true
 deactivate
 
@@ -27,4 +29,4 @@ SHELL=bash
 export SHELL
 source /opt/lsst/software/stack/loadLSST.bash
 conda env export | tee sciplat-conda-stack.yaml
-
+conda-tree deptree --full | tee "sciplat-conda-stack-tree"
