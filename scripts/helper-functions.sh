@@ -75,10 +75,11 @@ calculate_tags() {
     # DP2, and will be removed afterwards as part of our post-release cleanup.
     
     exp_tag=""
-    if [ "${tag_type}" != "r" ] && \
-       { [ "${input_tag}" != "latest" ] && \
-             [ "${input_tag}" != "${MAGIC_BLESSED_TAG}" ] }; then
-        exp_tag="${input_tag}"
+    if [ "${tag_type}" != "r" ]; then
+        if [ "${input_tag}" != "latest" ] && \
+               [ "${input_tag}" != "${MAGIC_BLESSED_TAG}" ]; then
+            exp_tag="${input_tag}"
+        fi
     fi
 
     # Put it all together.  If supplementary is already set, we don't need
@@ -92,7 +93,7 @@ calculate_tags() {
 
     if [ -z "${supplementary}" ]; then
         if [ -n "${exp_branch}" ] || [ -n "${exp_tag}" ]; then
-	    # Prefer tag over branch for setting the supplementary tag.
+            # Prefer tag over branch for setting the supplementary tag.
             discriminator=""
             if [ -n "${exp_tag}" ]; then
                 discriminator="${exp_tag}"
