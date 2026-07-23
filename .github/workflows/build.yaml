@@ -21,7 +21,9 @@ on:
       input:
         description: 'input image; you probably should change at most the tag'
         required: false
-        default: 'ghcr.io/lsst-sqre/nublado-jupyterlab-base:latest'
+        # FIXME: change it back to 'latest' after DP2 is out and we've
+        # cleaned everything up.
+        default: 'ghcr.io/lsst-sqre/nublado-jupyterlab-base:tickets-DM-55555'
 
 # We need actions/write if we want to do a GH App, and we need
 # packages/write to push to ghcr.io with GITHUB_TOKEN
