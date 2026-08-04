@@ -29,4 +29,8 @@ SHELL=bash
 export SHELL
 source /opt/lsst/software/stack/loadLSST.bash
 conda env export | tee sciplat-conda-stack.yaml
-uv pip tree | tee "sciplat-conda-stack-tree"
+# If conda-tree is installed, use it to generate a tree view of dependencies.
+# If not, clean up output from the failed command
+if ! (which conda tree --full > sciplat-conda-stack-tree); then
+    rm -f sciplat-conda-stack-tree
+fi
