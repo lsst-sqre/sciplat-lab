@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -x
-
 set -eo pipefail  # -u and conda don't play well: ADDR2LINE: unbound variable
+
+TAG=$1
 
 # First system; we prepend sciplat- so we can see what (if anything) changed
 # between the base container and this one.
@@ -35,7 +36,17 @@ if ! (which conda tree --full > sciplat-conda-stack-tree); then
     rm -f sciplat-conda-stack-tree
 fi
 
-# Add the tutorials as they existed when the container was built.
-cd /etc/nublado
-git clone --depth 1 "https://github.com/lsst/tutorial-notebooks" -b main \
-    tutorial-notebooks-at-build-time
+# Add the tutorials as they existed when the container was built, but only
+# if this is a release, release candidate, or an experimental version
+# thereof.
+#
+# Fortunately, ${TAG} is the eups version, so we don't have to care about
+# any of the shenanigans we did to generate our image tag.  If it starts with
+# "v", it is in the above category.
+itype=$(echo ${TAG} | cut -c 1)
+if [ ${itype} == "v" ]; then
+    # It's a release-ish build
+    cd /etc/nublado
+    git clone --depth 1 "https://github.com/lsst/tutorial-notebooks" -b main \
+        tutorial-notebooks-at-build-time  
+fi
