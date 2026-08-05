@@ -88,7 +88,7 @@ FROM compat-rsp-image AS manifests-rsp-image
 # "what broke this week?"
 
 COPY scripts/generate-versions /tmp/build
-RUN cd /tmp/build && ./generate-versions
+RUN cd /tmp/build && ./generate-versions ${tag}
 
 FROM manifests-rsp-image AS rsp-image
 ARG version
