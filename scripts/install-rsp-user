@@ -67,44 +67,22 @@ fi
 conda install -y --no-update-deps -c lsstts ts-m1m3-utils ts-salobj ts-utils \
       ts-ofc
 
-# Try lsdb separately.
-#
-# It went into rubin-env-rsp in rubin-env 11, but we might need to rebuild an
-# earlier image (e.g. 29.2.0, which uses rubin-env 10).  Remove this after
-# we're done with the 29.x.x series.
-#
-# Note that lsdb 0.6.4 is the version that is compatible with the rest of
-# rubin-env 10, paired with hats 0.6.4.  That also needs cdshealpix 0.7.1.
-#
-# Do the same with reproject, which CST wants in a 29.x.x image, and with
-# lsst-rsp, which is now conda packaged but, again, was not in rubin-env 10.
-#
-# This is all pretty janky and feels like it's going to create a rolling
-# window of tech debt.  In fact, you could conceptualize all of this
-# conditional installation as the balloon of tech debt which deflates with
-# each new release/recommended cycle, but which then reinflates over its
-# lifespan.
-#
-# The need to support old releases and have reasonable reproducibility of
-# any particular release and CST's desire to add new features to old
-# releases at will are kind of incompatible.
+# Assuming we're not going to get AI into the mainline build until we're
+# done with 29.x.
+# Additional AI packages for the payload side, eventually to be rolled back
+# into rubin-env-rsp
+
+# There's some weird pin thing going on with lxml 6.1.1.
+# Relax no-update-deps for now, but it needs to get fixed before merge.
+conda install -y jupyter-ai-magic-commands nb-cli
 
 conda_list=$(conda list --export)
 
-have_lsdb=$(echo "${conda_list}" | grep lsdb) || /bin/true
-if [ -z "${have_lsdb}" ]; then
-    echo "Doing separate installation of lsdb/hats 0.6.4"
-    conda install -y --no-update-deps lsdb=0.6.4 hats=0.6.4 cdshealpix=0.7.1
-fi
-
-have_reproject=$(echo "${conda_list}" | grep reproject) || /bin/true
-if [ -z "${have_reproject}" ]; then
-    echo "Doing separate installation of reproject"
-    conda install -y --no-update-deps reproject=0.19.0
-fi
-
 # If we must install pip packages, do it here, but that turns into a
 # dependency hell nightmare, and we really, really would prefer not to.
+#
+# We may need to if we need litellm on the payload side, because the version
+# pins are ridiculously overspecified.
 
 # We've removed lsst-rsp from rubin-env-rsp (RFC 1167).
 # In the case of this particular package, we actually do want the most recent
