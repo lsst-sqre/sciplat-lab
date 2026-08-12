@@ -1,0 +1,13 @@
+#!/bin/sh
+set -x
+set -euo pipefail
+
+# If it wasn't already put there by jupyterlab-base, add Tini for proper
+#  reaping and signal forwarding.
+
+TINI_VERSION=v0.19.0
+if ! [ -x /tini ]; then
+    curl -s -o /tini -L \
+        https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini
+    chmod +x /tini
+fi
