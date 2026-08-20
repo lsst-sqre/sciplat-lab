@@ -21,8 +21,6 @@ on:
       input:
         description: 'input image; you probably should change at most the tag'
         required: false
-        # FIXME: change it back to 'latest' after DP2 is out and we've
-        # cleaned everything up.
         default: 'ghcr.io/lsst-sqre/nublado-jupyterlab-base:latest'
 
 # We need actions/write if we want to do a GH App, and we need
