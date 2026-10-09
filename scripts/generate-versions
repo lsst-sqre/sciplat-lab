@@ -32,8 +32,9 @@ source /opt/lsst/software/stack/loadLSST.bash
 conda env export | tee sciplat-conda-stack.yaml
 # If conda-tree is installed, use it to generate a tree view of dependencies.
 # If not, clean up output from the failed command
-if ! (which conda tree --full > sciplat-conda-stack-tree); then
-    rm -f sciplat-conda-stack-tree
+ct=$(which conda-tree || /bin/true)
+if [ -n "${ct}" ]; then
+    conda-tree deptree > sciplat-conda-stack-tree
 fi
 
 # Add the tutorials as they existed when the container was built, but only
