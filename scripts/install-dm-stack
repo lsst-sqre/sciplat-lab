@@ -17,7 +17,9 @@ sbt=https://raw.githubusercontent.com/lsst/shebangtron/main/shebangtron
 
 mkdir -p $stackdir
 cd $stackdir
-curl -OL https://ls.st/lsstinstall
+# https://ls.st/lsstinstall -- but ls.st is not entirely stable
+repo="https://raw.githubusercontent.com/lsst/lsst"
+curl -OL "${repo}/refs/heads/main/scripts/lsstinstall"
 chmod u+x lsstinstall
 # Alas, if we don't run it with bash, some of the activate scripts
 # (rust and openmpi) fail, because they assume bash, not POSIX shell.
