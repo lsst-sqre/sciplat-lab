@@ -14,16 +14,6 @@ COPY static/etc/passwd /etc/passwd
 COPY static/etc/group  /etc/group
 RUN grpconv && pwconv
 
-# Install Tini if we didn't in base.
-
-COPY scripts/install-tini /tmp/build
-RUN cd /tmp/build && ./install-tini
-
-# We can't specify this conditionally, but the last ENTRYPOINT wins,
-# so we might be doing this twice (once in base and once here) but it
-# doesn't matter.
-ENTRYPOINT ["/tini", "--"]
-
 COPY scripts/install-system-packages /tmp/build
 # profile.d now means we always start in ${HOME}.
 RUN cd /tmp/build && ./install-system-packages
