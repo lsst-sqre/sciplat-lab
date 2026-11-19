@@ -19,10 +19,11 @@ RUN grpconv && pwconv
 COPY scripts/install-tini /tmp/build
 RUN cd /tmp/build && ./install-tini
 
-# We can't specify this conditionally, but the last ENTRYPOINT wins,
-# so we might be doing this twice (once in base and once here) but it
-# doesn't matter.
-ENTRYPOINT ["/tini", "--"]
+# We can't specify this conditionally, so we might be doing this twice
+#  (once in base and once here) but it doesn't matter since the last entry
+#  wins.  As long as we install our tini where dpkg puts it, then we
+#  will ensure there is some tini there, and that it is the entrypoint.
+ENTRYPOINT ["/usr/bin/tini", "--"]
 
 COPY scripts/install-system-packages /tmp/build
 # profile.d now means we always start in ${HOME}.

@@ -6,8 +6,8 @@ set -euo pipefail
 #  reaping and signal forwarding.
 
 TINI_VERSION=v0.19.0
-if ! [ -x /tini ]; then
-    curl -s -o /tini -L \
+if ! [ -x /usr/bin/tini ]; then
+    curl -s -o /usr/bin/tini -L \
         https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini
-    chmod +x /tini
+    chmod +x /usr/bin/tini
 fi
